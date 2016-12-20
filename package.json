@@ -1,0 +1,17 @@
+{
+  "name": "c3t-drop",
+  "version": "0.1.0",
+  "description": "A drop point for material that helps us translate c3 talks",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Philipp Bock <p@philippbock.de> (http://philippbock.de/)",
+  "license": "MIT",
+  "dependencies": {
+    "chokidar": "^1.6.1",
+    "express": "^4.14.0",
+    "fs-promise": "^1.0.0",
+    "lodash": "^4.17.2"
+  }
+}
