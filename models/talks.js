@@ -27,8 +27,20 @@ function slugify(string, lang='en') {
 		.replace(/\s+/g, '-')
 }
 
+class File {
+	constructor(filePath, meta) {
+		this.name = path.basename(filePath);
+		this._path = filePath;
+		this.meta = meta;
+	}
+
+	read() {
+		return fs.createReadStram(this._path);
+	}
+}
+
 module.exports = function(scheduleJsonPath, fileRootPath) {
-	let talks = [], talksBySlug = {};
+	let talks = [], talksBySlug = {}, files = {};
 	updateTalks();
 
 	let talksReady = updateTalks();
@@ -55,6 +67,22 @@ module.exports = function(scheduleJsonPath, fileRootPath) {
 
 			talks.push(this);
 			talksBySlug[this.slug] = this;
+
+			this._filesCache = null;
+		}
+
+		get files() {
+			if (!this._filesCache) this._filesCache = _(files)
+				.map((meta, filePath) => ({ meta, path: filePath }))
+				.filter((file) => !file.meta.isDir && file.path.indexOf(this.filePath) === 0)
+				.map((file) => new File(file.path, file.meta))
+				.value();
+			return this._filesCache;
+		}
+
+		addFile(name) {
+			const filePath = path.resolve(this.filePath, name);
+			return fs.createWriteStream(filePath);
 		}
 	}
 
@@ -65,6 +93,25 @@ module.exports = function(scheduleJsonPath, fileRootPath) {
 	Talk.findBySlug = (slug) => {
 		return Promise.all([ talksReady, filesReady ]).then(() => talksBySlug[slug]);
 	}
+
+	function updateTalks() {
+		return fs.readFile(scheduleJsonPath)
+			.then(JSON.parse)
+			.then(({ schedule }) => {
+				talks = [];
+				talksBySlug = {};
+
+				_.each(schedule.conference.days, (day) => {
+					_.each(day.rooms, (talks) => {
+						_.each(talks, (talk) => {
+							new Talk(talk, day.index + 1)
+						})
+					})
+				})
+			})
+			.then( () => Promise.all(talks.map(t => fs.ensureDir(t.filePath))) )
+	}
+
 
 	let filesReady = new Promise((resolve) => {
 		const fileWatcher = chokidar.watch(fileRootPath, {
@@ -83,42 +130,27 @@ module.exports = function(scheduleJsonPath, fileRootPath) {
 			})
 	})
 
-
 	const scheduleWatcher = chokidar.watch(scheduleJsonPath);
 	scheduleWatcher.on('change', () => {
 		console.log('Schedule changed; updating');
 		talksReady = Promise.all([ talksReady, filesReady ]).then(updateTalks);
 	})
 
-	function updateTalks() {
-		return fs.readFile(scheduleJsonPath)
-			.then(JSON.parse)
-			.then(({ schedule }) => {
-				talks = [];
-				talksBySlug = {};
-
-				_.each(schedule.conference.days, (day) => {
-					_.each(day.rooms, (talks) => {
-						_.each(talks, (talk) => {
-							new Talk(talk, day.index + 1)
-						})
-					})
-				})
-			})
+	function addFile(p, stats) {
+		p = path.resolve(p);
+		files[p] = { stats, isDir: false };
 	}
-
-	const files = {};
-	function addFile(path, stats) {
-		files[path] = { stats, isDir: false };
+	function removeFile(p) {
+		p = path.resolve(p);
+		files[p] = null;
 	}
-	function removeFile(path) {
-		files[path] = null;
+	function addDir(p) {
+		p = path.resolve(p);
+		files[p] = { isDir: true };
 	}
-	function addDir(path) {
-		files[path] = { isDir: true };
-	}
-	function removeDir(path) {
-		files[path] = null;
+	function removeDir(p) {
+		p = path.resolve(p);
+		files[p] = null;
 	}
 
 	return Talk;
