@@ -1,16 +1,44 @@
 html
 	head
 		title= talk.title
+		link(href='/vendor/bootstrap/css/bootstrap.min.css', rel='stylesheet')
+		meta(name='viewport', content='width=device-width, initial-scale=1')
+		meta(charset='utf-8')
 	body
-		h1= talk.title
+		nav.navbar.navbar-default.navbar-static-top
+			.container
+				.navbar-header
+					a.navbar-brand(href='/') c3lingo File Upload
+		.container
+			h1= talk.title
 
-		h2 Files
-		if !talk.files.length
-			p No files have been uploaded yet
-		else
-			ul
-				each file in talk.files
-					li
-						a(href=`/${talk.slug}/${file.name}`)
-							h3= file.redactedName
-							p= `Last Modified: ${file.meta.stats.mtime}`
+			section
+				h3 Upload files
+				form.well(method='POST', action='files/' enctype='multipart/form-data')
+					.form-group
+						label(for='input-files') Choose one or more files to upload
+						input#input-files(type='file', name='files', multiple)
+					.form-group
+						label(for='textarea-comment') Add a comment if you like
+						textarea#textarea-comment.form-control(rows=5)
+					p.help-block
+						| We'll only use uploaded files to help us provide simultaneous interpretations of talks at 33c3. We won't share them outside our group of volunteers without your consent.
+					p.help-block
+						| Once uploaded, we'll only display part of the file name and the date of its last modification.
+					input.btn.btn-primary(type='submit', value='Upload Files')
+					
+
+			section
+				h3
+					| Uploaded so far
+					=' '
+					span.badge= talk.files.length
+				if !talk.files.length
+					p No files have been uploaded yet
+				else
+					.list-group
+						each file in talk.files
+							.list-group-item
+								h5.list-group-item-heading
+									= file.redactedName
+								p.list-group-item-text= `Last Modified: ${file.meta.stats.mtime}`

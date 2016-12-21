@@ -1,15 +1,32 @@
 html
 	head
-		title= title
+		title Talks
+		link(href='/vendor/bootstrap/css/bootstrap.min.css', rel='stylesheet')
+		meta(name='viewport', content='width=device-width, initial-scale=1')
+		meta(charset='utf-8')
+
+		script(type='text/javascript', src='static/index.js')
 	body
-		h1 Talks
-		ul
-			each talk in talks
-				li
-					a(href=`/${talk.slug}`)
-						dl
-							dt.talk-title Title
-							dd.talk-title= talk.title
-							dt.talk-speakers Speakers
-							dd.talk-speakers= talk.speakers.join(', ')
-						
+		nav.navbar.navbar-default.navbar-static-top
+			.container
+				.navbar-header
+					a.navbar-brand(href='/') c3lingo File Upload
+		.container
+			h1 Talks
+			p.input-group
+				label(for='filter').input-group-addon
+					span.glyphicon.glyphicon-search
+					=' Search'
+					noscript=' (JavaScript required)'
+				input#filter.form-control(type='text', placeholder='Start typing to find talks by name or speaker' autocomplete='off', autocorrect='off', autocapitalize='off', spellcheck='false') 
+			.list-group
+				each talk in talks
+					a(href=`/${talk.slug}/`, data-filter-string=`${talk.title} ${talk.speakers.join(' ')}`).list-group-item
+						h5.list-group-item-heading
+							= talk.title
+						p.list-group-item-text
+							span
+								= talk.speakers.join(', ')
+							=' · '
+							span(class=(talk.files.length ? 'label label-success' : 'label label-warning'))
+								= talk.files.length + ' files uploaded'

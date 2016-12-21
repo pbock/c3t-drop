@@ -9,6 +9,7 @@
   "author": "Philipp Bock <p@philippbock.de> (http://philippbock.de/)",
   "license": "MIT",
   "dependencies": {
+    "bootstrap": "3",
     "chokidar": "^1.6.1",
     "express": "^4.14.0",
     "fs-promise": "^1.0.0",

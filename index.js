@@ -12,8 +12,11 @@ const app = express();
 app.set('views', path.resolve(__dirname, 'views/'));
 app.set('view engine', 'pug');
 
+app.use('/vendor/bootstrap', express.static(path.resolve(__dirname, 'node_modules/bootstrap/dist/')));
+app.use('/static', express.static(path.resolve(__dirname, 'static/')));
+
 app.get('/', (req, res) => {
-	return Talk.all()
+	return Talk.allSorted()
 		.then(talks => res.render('index', { talks }));
 })
 

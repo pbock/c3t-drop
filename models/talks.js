@@ -27,11 +27,16 @@ function slugify(string, lang='en') {
 		.replace(/\s+/g, '-')
 }
 
+function sortTitle(title) {
+	return title.toLowerCase()
+		.replace(/^(a|an|the|der|die|das) /, '')
+}
+
 function redactFilename(filename) {
 	const extension = path.extname(filename);
 	const base = path.basename(filename, extension);
 	if (base.length < 4) return base + extension;
-	return base.substr(0, 2) + '[…]' + base.substr(-2) + extension; 
+	return base.substr(0, 2) + '[…]' + base.substr(-2) + extension;
 }
 
 class File {
@@ -48,7 +53,7 @@ class File {
 }
 
 module.exports = function(scheduleJsonPath, fileRootPath) {
-	let talks = [], talksBySlug = {}, files = {}, filesLastUpdated = null;
+	let talks = [], sortedTalks = [], talksBySlug = {}, files = {}, filesLastUpdated = null;
 	updateTalks();
 
 	let talksReady = updateTalks();
@@ -60,7 +65,8 @@ module.exports = function(scheduleJsonPath, fileRootPath) {
 			this.time = talk.start;
 			this.duration = talk.duration;
 			this.room = talk.room;
-			this.title = talk.title;
+			this.title = talk.title.trim();
+			this.sortTitle = sortTitle(this.title);
 			this.subtitle = talk.subtitle || undefined;
 			this.slug = slugify(talk.title, talk.language);
 			this.track = talk.track;
@@ -105,6 +111,10 @@ module.exports = function(scheduleJsonPath, fileRootPath) {
 		return Promise.all([ talksReady, filesReady ]).then(() => talks);
 	}
 
+	Talk.allSorted = () => {
+		return Promise.all([ talksReady, filesReady ]).then(() => sortedTalks);
+	}
+
 	Talk.findBySlug = (slug) => {
 		return Promise.all([ talksReady, filesReady ]).then(() => talksBySlug[slug]);
 	}
@@ -124,6 +134,7 @@ module.exports = function(scheduleJsonPath, fileRootPath) {
 					})
 				})
 			})
+			.then( () => sortedTalks = _.sortBy(talks, 'sortTitle') )
 			.then( () => Promise.all(talks.map(t => fs.ensureDir(t.filePath))) )
 	}
 
