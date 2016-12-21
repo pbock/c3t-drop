@@ -80,7 +80,7 @@ function ensureExistence(thing) {
 	return thing;
 }
 
-app.get('/:slug', (req, res, next) => {
+app.get('/talks/:slug', (req, res, next) => {
 	const uploadCount = req.query.uploadCount;
 	return Talk.findBySlug(req.params.slug)
 		.then(ensureExistence)
@@ -88,7 +88,7 @@ app.get('/:slug', (req, res, next) => {
 		.catch(next)
 })
 
-app.post('/:slug/files/', upload.any(), (req, res, next) => {
+app.post('/talks/:slug/files/', upload.any(), (req, res, next) => {
 	const { files, body } = req;
 	log.info({ files, body }, 'Files received');
 	return Talk.findBySlug(req.params.slug)
@@ -99,11 +99,11 @@ app.post('/:slug/files/', upload.any(), (req, res, next) => {
 			if (body.comment) tasks.push(talk.addComment(body.comment));
 			return Promise.all(tasks).then(() => talk);
 		})
-		.then(talk => { res.redirect(`/${talk.slug}/?uploadCount=${files.length}`) })
+		.then(talk => { res.redirect(`/talks/${talk.slug}/?uploadCount=${files.length}`) })
 		.catch(next)
 })
 
-app.get('/:slug/files/', (req, res) => {
+app.get('/talks/:slug/files/', (req, res) => {
 	res.redirect(`/${req.params.slug}/`);
 })
 
