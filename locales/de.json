@@ -18,5 +18,8 @@
 	"(JavaScript required)": "(JavaScript erforderlich)",
 	"Start typing to find talks by name or speaker": "Beginne zu tippen, um Vorträge nach Titel oder Vortragenden zu durchsuchen",
 	"%s files uploaded": "[0] Keine Datei hochgeladen|[1] 1 Datei hochgeladen|%s Dateien hochgeladen",
-	"Talks": "Talks"
+	"Talks": "Talks",
+	"INTRO_TEXT": "Auch dieses Jahr werden wir wieder alle Vorträge auf dem 33c3 von Deutsch ins Englische übersetzen (und umgekehrt). Weil die Vorträge so ein riesiges Themenspektrum abdecken, bereiten wir gern für jeden Vortrag einen Glossar vor. Wenn du einen Vortrag auf dem Kongress hältst, kannst du uns helfen, indem du uns dein Material schickst, das uns dabei helfen kann, zum Beispiel Präsentationsfolien oder Manuskripte.",
+	"INTRO_GET_STARTED": "Um zu beginnen, wähle bitte deinen Vortrag aus der Liste.",
+	"We’ll take any file type, up to 50 MB each": "Wir nehmen alles; bis zu 50 MB pro Datei"
 }

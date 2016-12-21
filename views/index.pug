@@ -1,7 +1,8 @@
 html(lang=__('LOCALE'))
 	head
-		title Talks
+		title= __('Talks') + ' – ' + __('SITE_NAME')
 		link(href='/vendor/bootstrap/css/bootstrap.min.css', rel='stylesheet')
+		link(href='/static/custom.css', rel='stylesheet')
 		meta(name='viewport', content='width=device-width, initial-scale=1')
 		meta(charset='utf-8')
 
@@ -16,6 +17,8 @@ html(lang=__('LOCALE'))
 					=' / '
 					a(href='?lang=en', lang='en', title='English') en
 		.container
+			p= __('INTRO_TEXT')
+			p= __('INTRO_GET_STARTED')
 			h1= __('Talks')
 			p.input-group
 				label(for='filter').input-group-addon
@@ -35,3 +38,8 @@ html(lang=__('LOCALE'))
 							=' · '
 							span(class=(talk.files.length ? 'label label-success' : 'label label-warning'))
 								= __n('%s files uploaded', talk.files.length)
+
+		footer.footer
+			.container
+				p.text-muted
+					a(href='/impressum') Impressum

@@ -1,0 +1,42 @@
+html(lang=__('LOCALE'))
+	head
+		title Impressum
+		link(href='/vendor/bootstrap/css/bootstrap.min.css', rel='stylesheet')
+		link(href='/static/custom.css', rel='stylesheet')
+		meta(name='viewport', content='width=device-width, initial-scale=1')
+		meta(charset='utf-8')
+
+		script(type='text/javascript', src='static/index.js')
+	body
+		nav.navbar.navbar-default.navbar-static-top
+			.container
+				.navbar-header
+					a.navbar-brand(href='/')= __('SITE_NAME')
+				p.navbar-text.navbar-right
+					a(href='?lang=de', lang='de', title='Deutsch') de
+					=' / '
+					a(href='?lang=en', lang='en', title='English') en
+		.container
+			h1 Impressum
+			p
+				| Philipp Bock
+				br
+				|Thulestraße 37
+				br
+				| 13189 Berlin
+
+			p
+				| E-Mail:
+				=' '
+				a(href='mailto:p@philippbock.de') p@philippbock.de
+				br
+				| Telefon: +49 30 56837172
+
+			p Verantwortlich für den Inhalt dieser Website nach §55 Abs. 2 RStV und/oder §5 TMG: Philipp Bock
+
+
+
+		footer.footer
+			.container
+				p.text-muted
+					a(href='/impressum') Impressum

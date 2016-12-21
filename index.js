@@ -14,6 +14,9 @@ const Talk = require('./models/talks')(schedulePath, filesBase);
 
 const upload = multer({
 	dest: path.resolve(__dirname, '.temp/'),
+	limits: {
+		fileSize: 50e6,
+	},
 })
 
 const app = express();
@@ -46,6 +49,10 @@ app.use('/static', express.static(path.resolve(__dirname, 'static/')));
 app.get('/', (req, res) => {
 	return Talk.allSorted()
 		.then(talks => res.render('index', { talks }));
+})
+
+app.get('/impressum', (req, res) => {
+	res.render('impressum');
 })
 
 app.get('/:slug', (req, res) => {
