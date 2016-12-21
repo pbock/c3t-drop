@@ -27,5 +27,6 @@
 	"The requested page could not be found.": "The requested page could not be found.",
 	"Help Us Translate 33c3": "Help Us Translate 33c3",
 	"Questions? Email": "Questions? Email",
-	"Questions? Email us at %s": "Questions? Email us at %s"
+	"Questions? Email us at %s": "Questions? Email us at %s",
+	"DATE_TIME": "D MMM YYYY HH:mm [UTC]"
 }

@@ -8,6 +8,7 @@ const i18n = require('i18n');
 const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
 const URL = require('url');
+const moment = require('moment')
 
 // Set up logger
 const log = bunyan.createLogger({ name: 'c3t-drop-server' });
@@ -61,6 +62,8 @@ app.set('view engine', 'pug');
 
 app.use('/vendor/bootstrap', express.static(path.resolve(__dirname, 'node_modules/bootstrap/dist/')));
 app.use('/static', express.static(path.resolve(__dirname, 'static/')));
+
+app.locals.moment = moment;
 
 app.get('/', (req, res) => {
 	return Talk.allSorted()
