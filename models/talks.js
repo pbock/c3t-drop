@@ -8,8 +8,6 @@ const _ = require('lodash');
 
 const COMMENT_EXTENSION = '.comment.txt';
 
-const log = bunyan.createLogger({ name: 'c3t-drop-model' });
-
 function slugify(string, lang='en') {
 	let s = ({
 		en: { equals: 'equals', ampersand: 'and', plus: 'plus' },
@@ -63,7 +61,9 @@ function wait(timeout) {
 	}
 }
 
-module.exports = function(scheduleJsonPath, fileRootPath) {
+module.exports = function(scheduleJsonPath, fileRootPath, shouldLog=true) {
+	const log = bunyan.createLogger({ name: 'c3t-drop-model', level: shouldLog ? 'info' : 'fatal' });
+
 	let talks = [], sortedTalks = [], talksBySlug = {}, files = {}, filesLastUpdated = null;
 	updateTalks();
 
@@ -134,6 +134,10 @@ module.exports = function(scheduleJsonPath, fileRootPath) {
 
 	Talk.findBySlug = (slug) => {
 		return Promise.all([ talksReady, filesReady ]).then(() => talksBySlug[slug]);
+	}
+
+	Talk._getAllFiles = () => {
+		return files;
 	}
 
 	function updateTalks() {
