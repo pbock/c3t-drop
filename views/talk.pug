@@ -1,63 +1,49 @@
-html(lang=__('LOCALE'))
-	head
-		title= talk.title + ' – ' + __('SITE_NAME')
-		link(href='/vendor/bootstrap/css/bootstrap.min.css', rel='stylesheet')
-		link(href='/static/custom.css', rel='stylesheet')
-		meta(name='viewport', content='width=device-width, initial-scale=1')
-		meta(charset='utf-8')
-		script(src='/static/talk.js', defer)
-	body
-		nav.navbar.navbar-default.navbar-static-top
-			.container
-				.navbar-header
-					a.navbar-brand(href='/')= __('SITE_NAME')
-				p.navbar-text.navbar-right
-					a(href='?lang=de', lang='de', title='Deutsch') de
-					=' / '
-					a(href='?lang=en', lang='en', title='English') en
-		.container
-			if uploadCount
-				.alert.alert-success
-					= __n('We’ve received %s files.', uploadCount)
+extends layout.pug
+
+block title
+	title= talk.title + ' – ' + __('SITE_NAME')
+
+block scripts
+	script(src='/static/talk.js', defer)
+
+block content
+	if uploadCount
+		.alert.alert-success
+			= __n('We’ve received %s files.', uploadCount)
+			=' '
+			strong= __('Thanks for helping us make 33c3 more accessible.')
+	h1= talk.title
+
+	section
+		h3= __('Upload Files')
+		form.well(method='POST', action='files/' enctype='multipart/form-data')
+			.form-group
+				label(for='input-files')
+					= __('Choose one or more files to upload')
 					=' '
-					strong= __('Thanks for helping us make 33c3 more accessible.')
-			h1= talk.title
+				input#input-files(type='file', name='files', multiple)
+				span.help-block= __('We’ll take any file type, up to 50 MB each')
+			.form-group
+				label(for='textarea-comment')= __('Add a comment if you like')
+				textarea#textarea-comment.form-control(rows=5, name='comment')
+			p.help-block
+				=__('We’ll only use the files you upload to help us provide simultaneous interpretations of talks at 33c3. We won’t share them outside our group of volunteers without your consent.')
+			p.help-block
+				=__('Once uploaded, we’ll only display part of the file name and the date of its last modification.')
+			input.btn.btn-primary(type='submit', value=__('Upload Files'))
 
-			section
-				h3= __('Upload Files')
-				form.well(method='POST', action='files/' enctype='multipart/form-data')
-					.form-group
-						label(for='input-files')
-							= __('Choose one or more files to upload')
-							=' '
-						input#input-files(type='file', name='files', multiple)
-						span.help-block= __('We’ll take any file type, up to 50 MB each')
-					.form-group
-						label(for='textarea-comment')= __('Add a comment if you like')
-						textarea#textarea-comment.form-control(rows=5, name='comment')
-					p.help-block
-						=__('We’ll only use the files you upload to help us provide simultaneous interpretations of talks at 33c3. We won’t share them outside our group of volunteers without your consent.')
-					p.help-block
-						=__('Once uploaded, we’ll only display part of the file name and the date of its last modification.')
-					input.btn.btn-primary(type='submit', value=__('Upload Files'))
-
-			section
-				h3
-					=__('Uploaded So Far')
-					=' '
-					span.badge= talk.files.length
-				if !talk.files.length
-					.well.well-lg
-						.text-muted= __('No files have been uploaded yet.')
-				else
-					.list-group
-						each file in talk.files
-							.list-group-item
-								h5.list-group-item-heading
-									= file.redactedName
-								p.list-group-item-text= __('Last Modified: %s', file.meta.stats.mtime.toString(j))
-
-		footer.footer
-			.container
-				p.text-muted
-					a(href='/impressum') Impressum
+	section
+		h3
+			=__('Uploaded So Far')
+			=' '
+			span.badge= talk.files.length
+		if !talk.files.length
+			.well.well-lg
+				.text-muted= __('No files have been uploaded yet.')
+		else
+			.list-group
+				each file in talk.files
+					.list-group-item
+						h5.list-group-item-heading
+							= file.redactedName
+						p.list-group-item-text= __('Last Modified: %s', file.meta.stats.mtime.toString(j))

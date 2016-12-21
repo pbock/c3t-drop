@@ -25,5 +25,7 @@
 	"We’ll take any file type, up to 50 MB each": "We’ll take any file type, up to 50 MB each",
 	"Error %s": "Error %s",
 	"The requested page could not be found.": "The requested page could not be found.",
-	"Help Us Translate 33c3": "Help Us Translate 33c3"
+	"Help Us Translate 33c3": "Help Us Translate 33c3",
+	"Questions? Email": "Questions? Email",
+	"Questions? Email us at %s": "Questions? Email us at %s"
 }

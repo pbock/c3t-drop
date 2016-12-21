@@ -1,0 +1,28 @@
+doctype html
+html(lang=__('LOCALE'))
+	head
+		block title
+			title= __('SITE_NAME')
+		link(href='/vendor/bootstrap/css/bootstrap.min.css', rel='stylesheet')
+		link(href='/static/custom.css', rel='stylesheet')
+		meta(name='viewport', content='width=device-width, initial-scale=1')
+		meta(charset='utf-8')
+		block scripts
+	body
+		nav.navbar.navbar-default.navbar-static-top
+			.container
+				.navbar-header
+					a.navbar-brand(href='/')= __('SITE_NAME')
+				p.navbar-text.navbar-right
+					a(href='?lang=de', lang='de', title='Deutsch') de
+					=' / '
+					a(href='?lang=en', lang='en', title='English') en
+		.container
+			block content
+
+		footer.footer
+			.container
+				p.text-muted
+					!= __('Questions? Email us at %s', '<a href="mailto:hello@c3lingo.org">hello@c3lingo.org</a>')
+					=' · '
+					a(href='/impressum') Impressum

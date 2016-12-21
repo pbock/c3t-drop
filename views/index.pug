@@ -1,45 +1,30 @@
-html(lang=__('LOCALE'))
-	head
-		title= __('Help Us Translate 33c3') + ' – ' + __('SITE_NAME')
-		link(href='/vendor/bootstrap/css/bootstrap.min.css', rel='stylesheet')
-		link(href='/static/custom.css', rel='stylesheet')
-		meta(name='viewport', content='width=device-width, initial-scale=1')
-		meta(charset='utf-8')
+extends layout.pug
 
-		script(type='text/javascript', src='static/index.js')
-	body
-		nav.navbar.navbar-default.navbar-static-top
-			.container
-				.navbar-header
-					a.navbar-brand(href='/')= __('SITE_NAME')
-				p.navbar-text.navbar-right
-					a(href='?lang=de', lang='de', title='Deutsch') de
-					=' / '
-					a(href='?lang=en', lang='en', title='English') en
-		.container
-			h1= __('Help Us Translate 33c3')
-			p= __('INTRO_TEXT')
-			p= __('INTRO_GET_STARTED')
-			p.input-group
-				label(for='filter').input-group-addon
-					span.glyphicon.glyphicon-search
-					=' '
-					=__('Search')
-					noscript=' ' + __('(JavaScript required)')
-				input#filter.form-control(type='text', placeholder=__('Start typing to find talks by name or speaker'), autocomplete='off', autocorrect='off', autocapitalize='off', spellcheck='false') 
-			.list-group
-				each talk in talks
-					a(href=`/${talk.slug}/`, data-filter-string=`${talk.title} ${talk.speakers.join(' ')}`).list-group-item
-						h5.list-group-item-heading
-							= talk.title
-						p.list-group-item-text
-							span
-								= talk.speakers.join(', ')
-							=' · '
-							span(class=(talk.files.length ? 'label label-success' : 'label label-warning'))
-								= __n('%s files uploaded', talk.files.length)
+block title
+	title= __('Help Us Translate 33c3') + ' – ' + __('SITE_NAME')
 
-		footer.footer
-			.container
-				p.text-muted
-					a(href='/impressum') Impressum
+block scripts
+	script(type='text/javascript', src='static/index.js')
+
+block content
+	h1= __('Help Us Translate 33c3')
+	p= __('INTRO_TEXT')
+	p= __('INTRO_GET_STARTED')
+	p.input-group
+		label(for='filter').input-group-addon
+			span.glyphicon.glyphicon-search
+			=' '
+			=__('Search')
+			noscript=' ' + __('(JavaScript required)')
+		input#filter.form-control(type='text', placeholder=__('Start typing to find talks by name or speaker'), autocomplete='off', autocorrect='off', autocapitalize='off', spellcheck='false') 
+	.list-group
+		each talk in talks
+			a(href=`/${talk.slug}/`, data-filter-string=`${talk.title} ${talk.speakers.join(' ')}`).list-group-item
+				h5.list-group-item-heading
+					= talk.title
+				p.list-group-item-text
+					span
+						= talk.speakers.join(', ')
+					=' · '
+					span(class=(talk.files.length ? 'label label-success' : 'label label-warning'))
+						= __n('%s files uploaded', talk.files.length)
