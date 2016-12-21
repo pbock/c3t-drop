@@ -4,12 +4,18 @@ html
 		link(href='/vendor/bootstrap/css/bootstrap.min.css', rel='stylesheet')
 		meta(name='viewport', content='width=device-width, initial-scale=1')
 		meta(charset='utf-8')
+		script(src='/static/talk.js', defer)
 	body
 		nav.navbar.navbar-default.navbar-static-top
 			.container
 				.navbar-header
 					a.navbar-brand(href='/') c3lingo File Upload
 		.container
+			if uploadCount
+				.alert.alert-success
+					| We've received #{uploadCount} files. 
+					=' '
+					strong Thanks for helping us to make 33c3 more accessible.
 			h1= talk.title
 
 			section
@@ -20,7 +26,7 @@ html
 						input#input-files(type='file', name='files', multiple)
 					.form-group
 						label(for='textarea-comment') Add a comment if you like
-						textarea#textarea-comment.form-control(rows=5)
+						textarea#textarea-comment.form-control(rows=5, name='comment')
 					p.help-block
 						| We'll only use uploaded files to help us provide simultaneous interpretations of talks at 33c3. We won't share them outside our group of volunteers without your consent.
 					p.help-block

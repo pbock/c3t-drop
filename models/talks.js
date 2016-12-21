@@ -5,6 +5,8 @@ const path = require('path');
 const fs = require('fs-promise');
 const _ = require('lodash');
 
+const COMMENT_EXTENSION = '.comment.txt';
+
 function slugify(string, lang='en') {
 	let s = ({
 		en: { equals: 'equals', ampersand: 'and', plus: 'plus' },
@@ -52,6 +54,12 @@ class File {
 	}
 }
 
+function wait(timeout) {
+	return function(...args) {
+		return new Promise(resolve => setTimeout(() => resolve(...args), timeout));
+	}
+}
+
 module.exports = function(scheduleJsonPath, fileRootPath) {
 	let talks = [], sortedTalks = [], talksBySlug = {}, files = {}, filesLastUpdated = null;
 	updateTalks();
@@ -89,7 +97,7 @@ module.exports = function(scheduleJsonPath, fileRootPath) {
 			if (!this._filesCache || this._filesCacheLastUpdated < filesLastUpdated) {
 				this._filesCache = _(files)
 					.map((meta, filePath) => ({ meta, path: filePath }))
-					.filter((file) => !file.meta.isDir && file.path.indexOf(this.filePath) === 0)
+					.filter((file) => !file.meta.isDir && !file.meta.isComment && file.path.indexOf(this.filePath) === 0)
 					.map((file) => new File(file.path, file.meta))
 					.value();
 				this._filesCacheLastUpdated = Date.now();
@@ -101,9 +109,15 @@ module.exports = function(scheduleJsonPath, fileRootPath) {
 			return fs.createReadStream(path.resolve(this.filePath, name));
 		}
 
-		addFile(name) {
-			const filePath = path.resolve(this.filePath, name);
-			return fs.createWriteStream(filePath);
+		addComment(comment) {
+			return fs.writeFile(path.resolve(this.filePath, `${Date.now()}${COMMENT_EXTENSION}`), comment)
+				.then(() => this)
+		}
+
+		addFiles(files) {
+			return Promise.all(files.map(file => fs.rename(file.path, path.resolve(this.filePath, file.originalname))))
+				.then(wait(100)) // HACK: prevent Promise from resolving before watcher fired and file list has been rebuilt
+				.then(() => this)
 		}
 	}
 
@@ -165,7 +179,8 @@ module.exports = function(scheduleJsonPath, fileRootPath) {
 
 	function addFile(p, stats) {
 		p = path.resolve(p);
-		files[p] = { stats, isDir: false };
+		const isComment = p.substr(-COMMENT_EXTENSION.length) === COMMENT_EXTENSION;
+		files[p] = { stats, isDir: false, isComment };
 		filesLastUpdated = Date.now();
 	}
 	function removeFile(p) {
