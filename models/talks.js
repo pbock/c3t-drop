@@ -1,11 +1,14 @@
 'use strict';
 
 const chokidar = require('chokidar');
+const bunyan = require('bunyan');
 const path = require('path');
 const fs = require('fs-promise');
 const _ = require('lodash');
 
 const COMMENT_EXTENSION = '.comment.txt';
+
+const log = bunyan.createLogger({ name: 'c3t-drop-model' });
 
 function slugify(string, lang='en') {
 	let s = ({
@@ -150,9 +153,11 @@ module.exports = function(scheduleJsonPath, fileRootPath) {
 			})
 			.then( () => sortedTalks = _.sortBy(talks, 'sortTitle') )
 			.then( () => Promise.all(talks.map(t => fs.ensureDir(t.filePath))) )
+			.then( () => log.info('Done updating talks') )
 	}
 
 
+	let isInitialScan = true;
 	let filesReady = new Promise((resolve) => {
 		const fileWatcher = chokidar.watch(fileRootPath, {
 			alwaysStat: true,
@@ -164,36 +169,41 @@ module.exports = function(scheduleJsonPath, fileRootPath) {
 			.on('unlink', removeFile)
 			.on('addDir', addDir)
 			.on('unlinkDir', removeDir)
-			.on('error', (e) => { console.error(e.stack); process.exit(1) })
+			.on('error', (e) => { log.error(e); process.exit(1) })
 			.on('ready', () => {
-				console.log('Initial scan complete. Ready for changes');
+				log.info('Initial scan complete. Ready for changes');
+				isInitialScan = false;
 				resolve();
 			})
 	})
 
 	const scheduleWatcher = chokidar.watch(scheduleJsonPath);
 	scheduleWatcher.on('change', () => {
-		console.log('Schedule changed; updating');
+		log.info('Schedule changed; updating');
 		talksReady = Promise.all([ talksReady, filesReady ]).then(updateTalks);
 	})
 
 	function addFile(p, stats) {
+		if (!isInitialScan) log.info('Added file %s', p);
 		p = path.resolve(p);
 		const isComment = p.substr(-COMMENT_EXTENSION.length) === COMMENT_EXTENSION;
 		files[p] = { stats, isDir: false, isComment };
 		filesLastUpdated = Date.now();
 	}
 	function removeFile(p) {
+		if (!isInitialScan) log.info('Removed file %s', p);
 		p = path.resolve(p);
 		delete files[p];
 		filesLastUpdated = Date.now();
 	}
 	function addDir(p) {
+		if (!isInitialScan) log.info('Added directory %s', p);
 		p = path.resolve(p);
 		files[p] = { isDir: true };
 		filesLastUpdated = Date.now();
 	}
 	function removeDir(p) {
+		if (!isInitialScan) log.info('Removed directory %s', p);
 		p = path.resolve(p);
 		delete files[p];
 		filesLastUpdated = Date.now();

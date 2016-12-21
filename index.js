@@ -1,11 +1,21 @@
 'use strict';
 
 const path = require('path');
+const bunyan = require('bunyan');
 const express = require('express');
 const multer = require('multer');
 const i18n = require('i18n');
 const cookieParser = require('cookie-parser');
+const helmet = require('helmet');
 const URL = require('url');
+
+// Set up logger
+const log = bunyan.createLogger({ name: 'c3t-drop-server' });
+
+const isProduction = process.env.NODE_ENV === 'production';
+if (!isProduction) {
+	log.warn('NODE_ENV is not set to production. Actual value: %s', process.env.NODE_ENV);
+}
 
 const schedulePath = path.resolve(__dirname, 'schedule.json');
 const filesBase = path.resolve(__dirname, 'files/');
@@ -28,7 +38,13 @@ i18n.configure({
 	cookie: 'lang',
 })
 
+if (isProduction) {
+	app.use(helmet());
+}
+
 app.use((req, res, next) => {
+	log.info('%s %s', req.method, req.url);
+
 	if (req.query.lang) {
 		res.cookie('lang', req.query.lang, { maxAge: 900000, httpOnly: true });
 		const { pathname } = URL.parse(req.url);
@@ -55,16 +71,28 @@ app.get('/impressum', (req, res) => {
 	res.render('impressum');
 })
 
-app.get('/:slug', (req, res) => {
+function ensureExistence(thing) {
+	if (!thing) {
+		const err =new Error('Not found');
+		err.status = 404;
+		throw err;
+	}
+	return thing;
+}
+
+app.get('/:slug', (req, res, next) => {
 	const uploadCount = req.query.uploadCount;
 	return Talk.findBySlug(req.params.slug)
+		.then(ensureExistence)
 		.then(talk => res.render('talk', { talk, uploadCount }))
-		.catch(e => { console.error(e.stack) })
+		.catch(next)
 })
 
-app.post('/:slug/files/', upload.any(), (req, res) => {
+app.post('/:slug/files/', upload.any(), (req, res, next) => {
 	const { files, body } = req;
+	log.info({ files, body }, 'Files received');
 	return Talk.findBySlug(req.params.slug)
+		.then(ensureExistence)
 		.then(talk => {
 			const tasks = [];
 			if (files.length) tasks.push(talk.addFiles(files));
@@ -72,15 +100,28 @@ app.post('/:slug/files/', upload.any(), (req, res) => {
 			return Promise.all(tasks).then(() => talk);
 		})
 		.then(talk => { res.redirect(`/${talk.slug}/?uploadCount=${files.length}`) })
-		.catch(e => { console.error(e.stack) })
+		.catch(next)
 })
 
-app.get('/:slug/files/:file', (req, res) => {
-	return Talk.findBySlug(req.params.slug)
-		.then(talk => { talk.readFile(req.params.file).pipe(res) })
-		.catch(e => { console.error(e.stack) })
+app.get('/:slug/files/', (req, res) => {
+	res.redirect(`/${req.params.slug}/`);
+})
+
+// app.get('/:slug/files/:file', (req, res, next) => {
+// 	return Talk.findBySlug(req.params.slug)
+// 		.then(talk => { talk.readFile(req.params.file).pipe(res) })
+// 		.catch(next)
+// })
+
+app.use((req, res, next) => {
+	log.info(`%s %s Request didn't match a route`, req.method, req.url);
+	res.status(404).render('error', { status: 404 });
+})
+app.use((err, req, res, next) => {
+	log.warn(err, '%s %s Error handler sent', req.method, req.url);
+	res.status(err.status || 500).render('error', { status: err.status || 500 });
 })
 
 app.listen(9000, () => {
-	console.log('App listening on :9000');
+	log.info('App listening on :9000');
 })

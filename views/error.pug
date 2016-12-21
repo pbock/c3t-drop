@@ -1,0 +1,27 @@
+html(lang=__('LOCALE'))
+	head
+		title= __('Error %s', status)
+		link(href='/vendor/bootstrap/css/bootstrap.min.css', rel='stylesheet')
+		link(href='/static/custom.css', rel='stylesheet')
+		meta(name='viewport', content='width=device-width, initial-scale=1')
+		meta(charset='utf-8')
+
+		script(type='text/javascript', src='static/index.js')
+	body
+		nav.navbar.navbar-default.navbar-static-top
+			.container
+				.navbar-header
+					a.navbar-brand(href='/')= __('SITE_NAME')
+				p.navbar-text.navbar-right
+					a(href='?lang=de', lang='de', title='Deutsch') de
+					=' / '
+					a(href='?lang=en', lang='en', title='English') en
+		.container
+			h1= __('Error %s', status)
+			if status === 404
+				p= __('The requested page could not be found.')
+
+		footer.footer
+			.container
+				p.text-muted
+					a(href='/impressum') Impressum
