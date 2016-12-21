@@ -3,6 +3,9 @@
 const path = require('path');
 const express = require('express');
 const multer = require('multer');
+const i18n = require('i18n');
+const cookieParser = require('cookie-parser');
+const URL = require('url');
 
 const schedulePath = path.resolve(__dirname, 'schedule.json');
 const filesBase = path.resolve(__dirname, 'files/');
@@ -14,6 +17,26 @@ const upload = multer({
 })
 
 const app = express();
+
+// Configure internationalization
+i18n.configure({
+	directory: path.resolve(__dirname, 'locales/'),
+	locales: [ 'en', 'de' ],
+	cookie: 'lang',
+})
+
+app.use((req, res, next) => {
+	if (req.query.lang) {
+		res.cookie('lang', req.query.lang, { maxAge: 900000, httpOnly: true });
+		const { pathname } = URL.parse(req.url);
+		res.redirect(pathname);
+	} else {
+		next();
+	}
+})
+app.use(cookieParser());
+app.use(i18n.init);
+
 app.set('views', path.resolve(__dirname, 'views/'));
 app.set('view engine', 'pug');
 

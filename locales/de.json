@@ -1,0 +1,22 @@
+{
+	"LOCALE": "de",
+	"SITE_NAME": "c3lingo Dateiablage",
+	"Choose one or more files to upload": "Wähle eine oder mehrere Dateien aus",
+	"We’ve received %s files.": {
+		"one": "Wir haben deine Datei erhalten.",
+		"other": "Wir haben deine %s Dateien erhalten."
+	},
+	"Thanks for helping us make 33c3 more accessible.": "Danke, dass du uns dabei hilfst, den 33c3 für alle zugänglich zu machen.",
+	"Add a comment if you like": "Füge einen Kommentar hinzu, wenn du möchtest",
+	"We’ll only use the files you upload to help us provide simultaneous interpretations of talks at 33c3. We won’t share them outside our group of volunteers without your consent.": "Wir werden die Dateien, die du hochlädst, nur für unsere Simultanübersetzungen der Vorträge auf dem 33c3 nutzen. Wir werden sie nicht ohne deine Einwilligung mit anderen teilen.",
+	"Once uploaded, we’ll only display part of the file name and the date of its last modification.": "Sobald deine Dateien hochgeladen sind, zeigen wir nur noch den Dateinamen und das Datum der letzen Änderung.",
+	"Upload Files": "Dateien hochladen",
+	"Uploaded So Far": "Bisher hochgeladen",
+	"No files have been uploaded yet.": "Es wurden noch keine Dateien hochgeladen.",
+	"Last Modified: %s": "Zuletzt bearbeitet: %s",
+	"Search": "Suche",
+	"(JavaScript required)": "(JavaScript erforderlich)",
+	"Start typing to find talks by name or speaker": "Beginne zu tippen, um Vorträge nach Titel oder Vortragenden zu durchsuchen",
+	"%s files uploaded": "[0] Keine Datei hochgeladen|[1] 1 Datei hochgeladen|%s Dateien hochgeladen",
+	"Talks": "Talks"
+}

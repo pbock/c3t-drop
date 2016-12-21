@@ -1,4 +1,4 @@
-html
+html(lang=__('LOCALE'))
 	head
 		title= talk.title
 		link(href='/vendor/bootstrap/css/bootstrap.min.css', rel='stylesheet')
@@ -9,42 +9,47 @@ html
 		nav.navbar.navbar-default.navbar-static-top
 			.container
 				.navbar-header
-					a.navbar-brand(href='/') c3lingo File Upload
+					a.navbar-brand(href='/')= __('SITE_NAME')
+				p.navbar-text.navbar-right
+					a(href='?lang=de', lang='de', title='Deutsch') de
+					=' / '
+					a(href='?lang=en', lang='en', title='English') en
 		.container
 			if uploadCount
 				.alert.alert-success
-					| We've received #{uploadCount} files. 
+					= __n('We’ve received %s files.', uploadCount)
 					=' '
-					strong Thanks for helping us to make 33c3 more accessible.
+					strong= __('Thanks for helping us make 33c3 more accessible.')
 			h1= talk.title
 
 			section
-				h3 Upload files
+				h3= __('Upload Files')
 				form.well(method='POST', action='files/' enctype='multipart/form-data')
 					.form-group
-						label(for='input-files') Choose one or more files to upload
+						label(for='input-files')= __('Choose one or more files to upload')
 						input#input-files(type='file', name='files', multiple)
 					.form-group
-						label(for='textarea-comment') Add a comment if you like
+						label(for='textarea-comment')= __('Add a comment if you like')
 						textarea#textarea-comment.form-control(rows=5, name='comment')
 					p.help-block
-						| We'll only use uploaded files to help us provide simultaneous interpretations of talks at 33c3. We won't share them outside our group of volunteers without your consent.
+						=__('We’ll only use the files you upload to help us provide simultaneous interpretations of talks at 33c3. We won’t share them outside our group of volunteers without your consent.')
 					p.help-block
-						| Once uploaded, we'll only display part of the file name and the date of its last modification.
-					input.btn.btn-primary(type='submit', value='Upload Files')
+						=__('Once uploaded, we’ll only display part of the file name and the date of its last modification.')
+					input.btn.btn-primary(type='submit', value=__('Upload Files'))
 					
 
 			section
 				h3
-					| Uploaded so far
+					=__('Uploaded So Far')
 					=' '
 					span.badge= talk.files.length
 				if !talk.files.length
-					p No files have been uploaded yet
+					.well.well-lg
+						= __('No files have been uploaded yet.')
 				else
 					.list-group
 						each file in talk.files
 							.list-group-item
 								h5.list-group-item-heading
 									= file.redactedName
-								p.list-group-item-text= `Last Modified: ${file.meta.stats.mtime}`
+								p.list-group-item-text= __('Last Modified: %s', file.meta.stats.mtime.toString(j))

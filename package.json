@@ -11,8 +11,10 @@
   "dependencies": {
     "bootstrap": "3",
     "chokidar": "^1.6.1",
+    "cookie-parser": "^1.4.3",
     "express": "^4.14.0",
     "fs-promise": "^1.0.0",
+    "i18n": "^0.8.3",
     "lodash": "^4.17.2",
     "multer": "^1.2.1",
     "pug": "^2.0.0-beta6"
