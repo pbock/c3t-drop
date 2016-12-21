@@ -27,9 +27,17 @@ function slugify(string, lang='en') {
 		.replace(/\s+/g, '-')
 }
 
+function redactFilename(filename) {
+	const extension = path.extname(filename);
+	const base = path.basename(filename, extension);
+	if (base.length < 4) return base + extension;
+	return base.substr(0, 2) + '[…]' + base.substr(-2) + extension; 
+}
+
 class File {
 	constructor(filePath, meta) {
 		this.name = path.basename(filePath);
+		this.redactedName = redactFilename(this.name);
 		this._path = filePath;
 		this.meta = meta;
 	}
@@ -40,7 +48,7 @@ class File {
 }
 
 module.exports = function(scheduleJsonPath, fileRootPath) {
-	let talks = [], talksBySlug = {}, files = {};
+	let talks = [], talksBySlug = {}, files = {}, filesLastUpdated = null;
 	updateTalks();
 
 	let talksReady = updateTalks();
@@ -72,12 +80,19 @@ module.exports = function(scheduleJsonPath, fileRootPath) {
 		}
 
 		get files() {
-			if (!this._filesCache) this._filesCache = _(files)
-				.map((meta, filePath) => ({ meta, path: filePath }))
-				.filter((file) => !file.meta.isDir && file.path.indexOf(this.filePath) === 0)
-				.map((file) => new File(file.path, file.meta))
-				.value();
+			if (!this._filesCache || this._filesCacheLastUpdated < filesLastUpdated) {
+				this._filesCache = _(files)
+					.map((meta, filePath) => ({ meta, path: filePath }))
+					.filter((file) => !file.meta.isDir && file.path.indexOf(this.filePath) === 0)
+					.map((file) => new File(file.path, file.meta))
+					.value();
+				this._filesCacheLastUpdated = Date.now();
+			}
 			return this._filesCache;
+		}
+
+		readFile(name) {
+			return fs.createReadStream(path.resolve(this.filePath, name));
 		}
 
 		addFile(name) {
@@ -116,6 +131,7 @@ module.exports = function(scheduleJsonPath, fileRootPath) {
 	let filesReady = new Promise((resolve) => {
 		const fileWatcher = chokidar.watch(fileRootPath, {
 			alwaysStat: true,
+			ignored: '**/.DS_Store',
 		});
 		fileWatcher
 			.on('add', addFile)
@@ -139,18 +155,22 @@ module.exports = function(scheduleJsonPath, fileRootPath) {
 	function addFile(p, stats) {
 		p = path.resolve(p);
 		files[p] = { stats, isDir: false };
+		filesLastUpdated = Date.now();
 	}
 	function removeFile(p) {
 		p = path.resolve(p);
-		files[p] = null;
+		delete files[p];
+		filesLastUpdated = Date.now();
 	}
 	function addDir(p) {
 		p = path.resolve(p);
 		files[p] = { isDir: true };
+		filesLastUpdated = Date.now();
 	}
 	function removeDir(p) {
 		p = path.resolve(p);
-		files[p] = null;
+		delete files[p];
+		filesLastUpdated = Date.now();
 	}
 
 	return Talk;

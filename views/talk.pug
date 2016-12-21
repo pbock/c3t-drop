@@ -1,0 +1,16 @@
+html
+	head
+		title= talk.title
+	body
+		h1= talk.title
+
+		h2 Files
+		if !talk.files.length
+			p No files have been uploaded yet
+		else
+			ul
+				each file in talk.files
+					li
+						a(href=`/${talk.slug}/${file.name}`)
+							h3= file.redactedName
+							p= `Last Modified: ${file.meta.stats.mtime}`

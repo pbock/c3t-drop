@@ -1,0 +1,15 @@
+html
+	head
+		title= title
+	body
+		h1 Talks
+		ul
+			each talk in talks
+				li
+					a(href=`/${talk.slug}`)
+						dl
+							dt.talk-title Title
+							dd.talk-title= talk.title
+							dt.talk-speakers Speakers
+							dd.talk-speakers= talk.speakers.join(', ')
+						
