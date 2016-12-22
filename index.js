@@ -10,6 +10,9 @@ const helmet = require('helmet');
 const URL = require('url');
 const moment = require('moment')
 
+// Lib
+const push = require('./lib/pushover');
+
 // Set up logger
 const log = bunyan.createLogger({ name: 'c3t-drop-server' });
 
@@ -92,18 +95,27 @@ app.get('/talks/:slug', (req, res, next) => {
 })
 
 app.post('/talks/:slug/files/', upload.any(), (req, res, next) => {
+	let requestTalk;
 	const { files, body } = req;
 	log.info({ files, body }, 'Files received');
 	return Talk.findBySlug(req.params.slug)
 		.then(ensureExistence)
 		.then(talk => {
+			requestTalk = talk;
 			const tasks = [];
 			if (files.length) tasks.push(talk.addFiles(files));
 			if (body.comment) tasks.push(talk.addComment(body.comment));
 			return Promise.all(tasks).then(() => talk);
 		})
-		.then(talk => { res.redirect(`/talks/${talk.slug}/?uploadCount=${files.length}`) })
-		.catch(next)
+		.then(talk => {
+			res.redirect(`/talks/${talk.slug}/?uploadCount=${files.length}`);
+			push({ title: `Added files for talk ${talk.title}`, message: files.map(f => f.originalname).join('\n') });
+		})
+		.catch((err) => {
+			log.error(err, 'Failed to add files');
+			push({ title: `Failed to add files to talk ${requestTalk.title}`, message: err.stack });
+			next(err);
+		})
 })
 
 app.get('/talks/:slug/files/', (req, res) => {
