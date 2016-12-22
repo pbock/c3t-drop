@@ -79,7 +79,7 @@ app.get('/impressum', (req, res) => {
 
 function ensureExistence(thing) {
 	if (!thing) {
-		const err =new Error('Not found');
+		const err = new Error('Not found');
 		err.status = 404;
 		throw err;
 	}
@@ -91,6 +91,11 @@ app.get('/talks/:slug', (req, res, next) => {
 	return Talk.findBySlug(req.params.slug)
 		.then(ensureExistence)
 		.then(talk => res.render('talk', { talk, uploadCount }))
+		// If that failed, try looking the talk up by ID instead
+		.catch(() => Talk.findById(req.params.slug)
+			.then(ensureExistence)
+			.then(talk => res.redirect(`/talks/${talk.slug}/`))
+		)
 		.catch(next)
 })
 

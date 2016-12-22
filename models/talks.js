@@ -136,6 +136,10 @@ module.exports = function(scheduleJsonPath, fileRootPath, shouldLog=true) {
 		return Promise.all([ talksReady, filesReady ]).then(() => talksBySlug[slug]);
 	}
 
+	Talk.findById = (id) => {
+		return Promise.all([ talksReady, filesReady ]).then(() => _.find(talks, { id }));
+	}
+
 	Talk._getAllFiles = () => {
 		return files;
 	}
