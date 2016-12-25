@@ -50,6 +50,7 @@ app.use((req, res, next) => {
 	log.info('%s %s', req.method, req.url);
 
 	if (req.query.lang) {
+		log.info('Setting language to %s', req.query.lang);
 		res.cookie('lang', req.query.lang, { maxAge: 900000, httpOnly: true });
 		const { pathname } = URL.parse(req.url);
 		res.redirect(pathname);
@@ -87,10 +88,10 @@ function ensureExistence(thing) {
 }
 
 app.get('/talks/:slug', (req, res, next) => {
-	const uploadCount = req.query.uploadCount;
+	const { uploadCount, commentCount, nothingReceived } = req.query;
 	return Talk.findBySlug(req.params.slug)
 		.then(ensureExistence)
-		.then(talk => res.render('talk', { talk, uploadCount }))
+		.then(talk => res.render('talk', { talk, uploadCount, commentCount, nothingReceived }))
 		// If that failed, try looking the talk up by ID instead
 		.catch(() => Talk.findById(req.params.slug)
 			.then(ensureExistence)
@@ -102,6 +103,11 @@ app.get('/talks/:slug', (req, res, next) => {
 app.post('/talks/:slug/files/', upload.any(), (req, res, next) => {
 	let requestTalk;
 	const { files, body } = req;
+	if (!files.length && !body.comment) {
+		log.info('Form submitted, but no files and no comment received');
+		res.redirect(`/talks/${req.params.slug}/?nothingReceived=true`);
+		return;
+	}
 	log.info({ files, body }, 'Files received');
 	return Talk.findBySlug(req.params.slug)
 		.then(ensureExistence)
@@ -113,7 +119,7 @@ app.post('/talks/:slug/files/', upload.any(), (req, res, next) => {
 			return Promise.all(tasks).then(() => talk);
 		})
 		.then(talk => {
-			res.redirect(`/talks/${talk.slug}/?uploadCount=${files.length}`);
+			res.redirect(`/talks/${talk.slug}/?uploadCount=${files.length}&commentCount=${body.comment ? '1' : '0'}`);
 			push({ title: `Added files for talk ${talk.title}`, message: files.map(f => f.originalname).join('\n') });
 		})
 		.catch((err) => {

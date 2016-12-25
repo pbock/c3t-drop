@@ -29,5 +29,13 @@
 	"Questions? Email": "Questions? Email",
 	"Questions? Email us at %s": "Questions? Email us at %s",
 	"DATE_TIME": "D MMMM YYYY HH:mm [UTC]",
-	"calculating": "calculating"
+	"calculating": "calculating",
+	"Sorry, we didn't catch that.": "Sorry, we didn't catch that.",
+	"It looks like you submitted an empty form.": "It looks like you submitted an empty form.",
+	"We’ve received your comment.": "We’ve received your comment.",
+	"We’ve received %s files and your comment.": {
+		"one": "We’ve received your file and your comment.",
+		"other": "We’ve received %s files and your comment."
+	},
+	"Sorry, we didn’t catch that.": "Sorry, we didn’t catch that."
 }

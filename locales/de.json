@@ -27,5 +27,12 @@
 	"Help Us Translate 33c3": "Hilf uns, den 33c3 zu übersetzen",
 	"Questions? Email us at %s": "Noch Fragen? Du erreichst uns unter %s",
 	"DATE_TIME": "D. MMMM YYYY, HH:mm [UTC]",
-	"calculating": "wird berechnet"
+	"calculating": "wird berechnet",
+	"Sorry, we didn’t catch that.": "Das war wohl nichts.",
+	"It looks like you submitted an empty form.": "Es sieht so aus, als hättest du ein leeres Formular abgeschickt.",
+	"We’ve received your comment.": "Wir haben deinen Kommentar erhalten.",
+	"We’ve received %s files and your comment.": {
+		"one": "Wir haben deine Datei und deinen Kommentar erhalten.",
+		"other": "Wir haben deine %s Dateien und deinen Kommentar erhalten."
+	}
 }

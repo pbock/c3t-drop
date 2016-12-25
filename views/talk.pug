@@ -7,11 +7,21 @@ block scripts
 	script(src='/static/talk.js', defer)
 
 block content
-	if uploadCount
+	if uploadCount > 0 || commentCount > 0
 		.alert.alert-success
-			= __n('We’ve received %s files.', uploadCount)
+			if uploadCount > 0 && commentCount > 0
+				= __n('We’ve received %s files and your comment.', uploadCount)
+			else if uploadCount > 0
+				= __n('We’ve received %s files.', uploadCount)
+			else if commentCount > 0
+				= __('We’ve received your comment.')
 			=' '
 			strong= __('Thanks for helping us make 33c3 more accessible.')
+	else if nothingReceived
+		.alert.alert-danger
+			strong= __(`Sorry, we didn’t catch that.`)
+			=' '
+			= __(`It looks like you submitted an empty form.`)
 	h1= talk.title
 
 	section
