@@ -26,5 +26,6 @@
 	"The requested page could not be found.": "Die gesuchte Seite wurde nicht gefunden.",
 	"Help Us Translate 33c3": "Hilf uns, den 33c3 zu übersetzen",
 	"Questions? Email us at %s": "Noch Fragen? Du erreichst uns unter %s",
-	"DATE_TIME": "D. MMM YYYY, HH:mm [UTC]"
+	"DATE_TIME": "D. MMMM YYYY, HH:mm [UTC]",
+	"calculating": "wird berechnet"
 }

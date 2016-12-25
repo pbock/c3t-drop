@@ -46,4 +46,12 @@ block content
 					.list-group-item
 						h5.list-group-item-heading
 							= file.redactedName
-						p.list-group-item-text= __('Last Modified: %s', moment(file.meta.stats.mtime).locale(__('LOCALE')).format(__('DATE_TIME')))
+						p.list-group-item-text
+							= moment(file.meta.stats.mtime).locale(__('LOCALE')).format(__('DATE_TIME'))
+						p.list-group-item-text
+							| SHA-1:
+							=' '
+							if file.meta.hash
+								= file.meta.hash
+							else
+								em= __('calculating')

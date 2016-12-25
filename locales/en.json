@@ -28,5 +28,6 @@
 	"Help Us Translate 33c3": "Help Us Translate 33c3",
 	"Questions? Email": "Questions? Email",
 	"Questions? Email us at %s": "Questions? Email us at %s",
-	"DATE_TIME": "D MMM YYYY HH:mm [UTC]"
+	"DATE_TIME": "D MMMM YYYY HH:mm [UTC]",
+	"calculating": "calculating"
 }

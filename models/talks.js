@@ -6,6 +6,8 @@ const path = require('path');
 const fs = require('fs-promise');
 const _ = require('lodash');
 
+const streamHash = require('../lib/stream-hash');
+
 const COMMENT_EXTENSION = '.comment.txt';
 
 function slugify(string, lang='en') {
@@ -195,8 +197,17 @@ module.exports = function(scheduleJsonPath, fileRootPath, shouldLog=true) {
 		if (!isInitialScan) log.info('Added file %s', p);
 		p = path.resolve(p);
 		const isComment = p.substr(-COMMENT_EXTENSION.length) === COMMENT_EXTENSION;
-		files[p] = { stats, isDir: false, isComment };
+		files[p] = { stats, isDir: false, isComment, hash: null };
 		filesLastUpdated = Date.now();
+		streamHash(p).then(hash => {
+			// In the meantime, the file may have been deleted, in which case
+			// attempting to write the hash would throw an error.
+			if (!files[p]) return;
+			// It may also have been overwritten by a new version, in which case
+			// this is the wrong hash we'd be writing.
+			if (files[p].stats !== stats) return;
+			files[p].hash = hash;
+		}).catch(err => log.error(err, 'Error writing hash for file %s', p));
 	}
 	function removeFile(p) {
 		if (!isInitialScan) log.info('Removed file %s', p);
