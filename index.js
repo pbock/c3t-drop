@@ -20,6 +20,14 @@ const push = require('./lib/pushover');
 // Set up logger
 const log = bunyan.createLogger({ name: 'c3t-drop-server' });
 
+// Load config
+let config = {};
+try {
+	config = require('./config');
+} catch (e) {
+	log.warn('No config file found');
+}
+
 const isProduction = process.env.NODE_ENV === 'production';
 if (!isProduction) {
 	log.warn('NODE_ENV is not set to production. Actual value: %s', process.env.NODE_ENV);
@@ -54,7 +62,7 @@ if (isProduction) {
 function forceAuth(req, res, next) {
 	function unauthorized(res) {
 		res.set('WWW-Authenticate', 'Basic realm=Authorization Required');
-		return res.send(401);
+		return res.status(401).send('<h1>Unauthorized</h1>');
 	}
 	if (req.isAuthorized === undefined) checkAuth(req);
 	if (req.isAuthorized) return next();
@@ -64,7 +72,8 @@ function checkAuth(req, res, next) {
 	const user = basicAuth(req);
 
 	let authorized = false;
-	if (user && user.name === 'user' && user.pass === 'pass') authorized = true;
+	if (!config.readCredentials) authorized = false;
+	else if (user && user.name in config.readCredentials && user.pass === config.readCredentials[user.name]) authorized = true;
 
 	req.isAuthorized = authorized;
 	next();
@@ -131,7 +140,7 @@ app.get('/talks/:slug', (req, res, next) => {
 })
 
 app.get('/sign-in', forceAuth, (req, res) => {
-	res.send('Hello!');
+	res.redirect('/');
 })
 
 app.post('/talks/:slug/files/', upload.any(), (req, res, next) => {
