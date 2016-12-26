@@ -34,5 +34,6 @@
 	"We’ve received %s files and your comment.": {
 		"one": "Wir haben deine Datei und deinen Kommentar erhalten.",
 		"other": "Wir haben deine %s Dateien und deinen Kommentar erhalten."
-	}
+	},
+	"Read Access": "Lesezugriff"
 }

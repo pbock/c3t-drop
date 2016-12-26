@@ -10,6 +10,7 @@
   "author": "Philipp Bock <p@philippbock.de> (http://philippbock.de/)",
   "license": "MIT",
   "dependencies": {
+    "basic-auth": "^1.1.0",
     "bootstrap": "3",
     "bunyan": "^1.8.5",
     "chokidar": "^1.6.1",

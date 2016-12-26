@@ -53,15 +53,29 @@ block content
 		else
 			.list-group
 				each file in talk.files
-					.list-group-item
-						h5.list-group-item-heading
-							= file.redactedName
-						p.list-group-item-text
-							= moment(file.meta.stats.mtime).locale(__('LOCALE')).format(__('DATE_TIME'))
-						p.list-group-item-text
-							| SHA-1:
-							=' '
-							if file.meta.hash
-								= file.meta.hash
-							else
-								em= __('calculating')
+					if isAuthorized
+						a(href=`files/${file.name}`).list-group-item
+							h5.list-group-item-heading
+								= file.name
+							p.list-group-item-text
+								= moment(file.meta.stats.mtime).locale(__('LOCALE')).format(__('DATE_TIME'))
+							p.list-group-item-text
+								| SHA-1:
+								=' '
+								if file.meta.hash
+									= file.meta.hash
+								else
+									em= __('calculating')
+					else
+						.list-group-item
+							h5.list-group-item-heading
+								= file.redactedName
+							p.list-group-item-text
+								= moment(file.meta.stats.mtime).locale(__('LOCALE')).format(__('DATE_TIME'))
+							p.list-group-item-text
+								| SHA-1:
+								=' '
+								if file.meta.hash
+									= file.meta.hash
+								else
+									em= __('calculating')

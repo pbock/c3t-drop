@@ -48,12 +48,12 @@ class File {
 	constructor(filePath, meta) {
 		this.name = path.basename(filePath);
 		this.redactedName = redactFilename(this.name);
-		this._path = filePath;
+		this.path = filePath;
 		this.meta = meta;
 	}
 
 	read() {
-		return fs.createReadStram(this._path);
+		return fs.createReadStram(this.path);
 	}
 }
 

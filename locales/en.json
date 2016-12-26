@@ -37,5 +37,6 @@
 		"one": "We’ve received your file and your comment.",
 		"other": "We’ve received %s files and your comment."
 	},
-	"Sorry, we didn’t catch that.": "Sorry, we didn’t catch that."
+	"Sorry, we didn’t catch that.": "Sorry, we didn’t catch that.",
+	"Read Access": "Read Access"
 }

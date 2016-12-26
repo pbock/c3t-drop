@@ -5,10 +5,14 @@ const bunyan = require('bunyan');
 const express = require('express');
 const multer = require('multer');
 const i18n = require('i18n');
-const cookieParser = require('cookie-parser');
-const helmet = require('helmet');
 const URL = require('url');
 const moment = require('moment')
+const _ = require('lodash');
+
+// Middleware
+const cookieParser = require('cookie-parser');
+const helmet = require('helmet');
+const basicAuth = require('basic-auth');
 
 // Lib
 const push = require('./lib/pushover');
@@ -46,6 +50,29 @@ if (isProduction) {
 	app.use(helmet());
 }
 
+// Set up basic auth
+function forceAuth(req, res, next) {
+	function unauthorized(res) {
+		res.set('WWW-Authenticate', 'Basic realm=Authorization Required');
+		return res.send(401);
+	}
+	if (req.isAuthorized === undefined) checkAuth(req);
+	if (req.isAuthorized) return next();
+	return unauthorized(res);
+}
+function checkAuth(req, res, next) {
+	const user = basicAuth(req);
+
+	let authorized = false;
+	if (user && user.name === 'user' && user.pass === 'pass') authorized = true;
+
+	req.isAuthorized = authorized;
+	next();
+	return authorized;
+}
+
+app.use(checkAuth);
+
 app.use((req, res, next) => {
 	log.info('%s %s', req.method, req.url);
 
@@ -70,12 +97,14 @@ app.use('/static', express.static(path.resolve(__dirname, 'static/')));
 app.locals.moment = moment;
 
 app.get('/', (req, res) => {
+	const { isAuthorized } = req;
 	return Talk.allSorted()
-		.then(talks => res.render('index', { talks }));
+		.then(talks => res.render('index', { talks, isAuthorized }));
 })
 
 app.get('/impressum', (req, res) => {
-	res.render('impressum');
+	const { isAuthorized } = req;
+	res.render('impressum', { isAuthorized });
 })
 
 function ensureExistence(thing) {
@@ -89,15 +118,20 @@ function ensureExistence(thing) {
 
 app.get('/talks/:slug', (req, res, next) => {
 	const { uploadCount, commentCount, nothingReceived } = req.query;
+	const { isAuthorized } = req;
 	return Talk.findBySlug(req.params.slug)
 		.then(ensureExistence)
-		.then(talk => res.render('talk', { talk, uploadCount, commentCount, nothingReceived }))
+		.then(talk => res.render('talk', { talk, uploadCount, commentCount, nothingReceived, isAuthorized }))
 		// If that failed, try looking the talk up by ID instead
 		.catch(() => Talk.findById(req.params.slug)
 			.then(ensureExistence)
 			.then(talk => res.redirect(`/talks/${talk.slug}/`))
 		)
 		.catch(next)
+})
+
+app.get('/sign-in', forceAuth, (req, res) => {
+	res.send('Hello!');
 })
 
 app.post('/talks/:slug/files/', upload.any(), (req, res, next) => {
@@ -127,6 +161,21 @@ app.post('/talks/:slug/files/', upload.any(), (req, res, next) => {
 			push({ title: `Failed to add files to talk ${requestTalk.title}`, message: err.stack });
 			next(err);
 		})
+})
+
+app.get('/talks/:slug/files/:filename', forceAuth, (req, res, next) => {
+	return Talk.findBySlug(req.params.slug)
+		.then(ensureExistence)
+		.then(talk => {
+			const file = _.find(talk.files, { name: req.params.filename });
+			if (!file) {
+				const error = new Error('File not found');
+				error.status = 404;
+				throw(error);
+			}
+			res.sendFile(file.path);
+		})
+		.catch(next)
 })
 
 app.get('/talks/:slug/files/', (req, res) => {

@@ -14,6 +14,9 @@ html(lang=__('LOCALE'))
 				.navbar-header
 					a.navbar-brand(href='/')= __('SITE_NAME')
 				p.navbar-text.navbar-right
+					if isAuthorized
+						span.label.label-success= __('Read Access')
+						=' '
 					a(href='?lang=de', lang='de', title='Deutsch') de
 					=' / '
 					a(href='?lang=en', lang='en', title='English') en
