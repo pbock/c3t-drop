@@ -28,7 +28,7 @@
 	"Help Us Translate 33c3": "Help Us Translate 33c3",
 	"Questions? Email": "Questions? Email",
 	"Questions? Email us at %s": "Questions? Email us at %s",
-	"DATE_TIME": "D MMMM YYYY HH:mm [UTC]",
+	"DATE_TIME": "D MMMM YYYY HH:mm [UTC] Z",
 	"calculating": "calculating",
 	"Sorry, we didn't catch that.": "Sorry, we didn't catch that.",
 	"It looks like you submitted an empty form.": "It looks like you submitted an empty form.",
