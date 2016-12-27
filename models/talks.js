@@ -96,6 +96,7 @@ module.exports = function(scheduleJsonPath, fileRootPath, shouldLog=true) {
 			talksBySlug[this.slug] = this;
 
 			this._filesCache = null;
+			this._commentFilesCache = null;
 		}
 
 		get files() {
@@ -108,6 +109,18 @@ module.exports = function(scheduleJsonPath, fileRootPath, shouldLog=true) {
 				this._filesCacheLastUpdated = Date.now();
 			}
 			return this._filesCache;
+		}
+
+		get commentFiles() {
+			if (!this._commentFilesCache || this._commentFilesCacheLastUpdated < filesLastUpdated) {
+				this._commentFilesCache = _(files)
+					.map((meta, filePath) => ({ meta, path: filePath }))
+					.filter((file) => file.meta.isComment && file.path.indexOf(this.filePath) === 0)
+					.map((file) => new File(file.path, file.meta))
+					.value();
+				this._commentFilesCacheLastUpdated = Date.now();
+			}
+			return this._commentFilesCache;
 		}
 
 		// This is NOT a getter because it is asynchronous

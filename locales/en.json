@@ -40,5 +40,14 @@
 	"Sorry, we didn’t catch that.": "Sorry, we didn’t catch that.",
 	"Read Access": "Read Access",
 	"No comments have been submitted yet.": "No comments have been submitted yet.",
-	"Comments": "Comments"
+	"Comments": "Comments",
+	"%s comments": {
+		"one": "%s comment",
+		"other": "%s comments"
+	},
+	"Sorry, you need read access to see comments.": "Sorry, you need read access to see comments.",
+	"Day %s": {
+		"one": "Day %s",
+		"other": "Day %s"
+	}
 }

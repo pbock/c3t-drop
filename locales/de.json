@@ -37,5 +37,9 @@
 	},
 	"Read Access": "Lesezugriff",
 	"No comments have been submitted yet.": "Es gibt noch keine Kommentare.",
-	"Comments": "Kommentare"
+	"Comments": "Kommentare",
+	"%s comments": {
+		"one": "%s Kommentar",
+		"other": "%s Kommentare"
+	}
 }

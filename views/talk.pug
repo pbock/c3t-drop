@@ -22,7 +22,14 @@ block content
 			strong= __(`Sorry, we didn’t catch that.`)
 			=' '
 			= __(`It looks like you submitted an empty form.`)
-	h1= talk.title
+
+	h1
+		= talk.title
+		<br>
+		small
+			= talk.speakers.join(', ')
+			=' · '
+			= __n('Day %s', talk.day) + ', ' + talk.time
 
 	section
 		h3= __('Upload Files')
@@ -42,10 +49,13 @@ block content
 				=__('Once uploaded, we’ll only display part of the file name and the date of its last modification.')
 			input.btn.btn-primary(type='submit', value=__('Upload Files'))
 
-	if isAuthorized
-		section
-			h3= __('Comments')
-			if talk.comments.length
+	section
+		h3
+			= __('Comments')
+			=' '
+			span.badge= talk.commentFiles.length
+		if isAuthorized
+			if talk.commentFiles.length
 				each comment in talk.comments
 					.panel.panel-default
 						.panel-body= comment.body
@@ -53,7 +63,12 @@ block content
 			else
 				.well.well-lg
 					.text-muted= __('No comments have been submitted yet.')
-				
+		else
+			.well.well-lg
+				if talk.commentFiles.length
+					.text-muted= __(`Sorry, you need read access to see comments.`)
+				else
+					.text-muted= __('No comments have been submitted yet.')
 
 	section
 		h3

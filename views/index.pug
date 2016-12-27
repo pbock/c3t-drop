@@ -28,3 +28,6 @@ block content
 					=' · '
 					span(class=(talk.files.length ? 'label label-success' : 'label label-warning'))
 						= __n('%s files uploaded', talk.files.length)
+					=' '
+					if talk.commentFiles.length
+						span.label.label-info= __n('%s comments', talk.commentFiles.length)
