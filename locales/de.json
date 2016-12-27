@@ -41,5 +41,10 @@
 	"%s comments": {
 		"one": "%s Kommentar",
 		"other": "%s Kommentare"
-	}
+	},
+	"Day %s": {
+		"one": "Tag %s",
+		"other": "Tag %s"
+	},
+	"Sorry, you need read access to see comments.": "Du brauchst Lesezugriff, um die Kommentare zu sehen."
 }
