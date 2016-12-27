@@ -42,6 +42,19 @@ block content
 				=__('Once uploaded, we’ll only display part of the file name and the date of its last modification.')
 			input.btn.btn-primary(type='submit', value=__('Upload Files'))
 
+	if isAuthorized
+		section
+			h3= __('Comments')
+			if talk.comments.length
+				each comment in talk.comments
+					.panel.panel-default
+						.panel-body= comment.body
+						.panel-footer= moment(comment.meta.stats.ctime).locale(__('LOCALE')).format(__('DATE_TIME'))
+			else
+				.well.well-lg
+					.text-muted= __('No comments have been submitted yet.')
+				
+
 	section
 		h3
 			=__('Uploaded So Far')

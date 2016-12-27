@@ -130,6 +130,14 @@ app.get('/talks/:slug', (req, res, next) => {
 	const { isAuthorized } = req;
 	return Talk.findBySlug(req.params.slug)
 		.then(ensureExistence)
+		.then(talk => {
+			// FIXME: Refactor
+			if (req.isAuthorized) {
+				return talk.getComments()
+					.then(comments => { talk.comments = comments; return talk; })
+			}
+			return talk;
+		})
 		.then(talk => res.render('talk', { talk, uploadCount, commentCount, nothingReceived, isAuthorized }))
 		// If that failed, try looking the talk up by ID instead
 		.catch(() => Talk.findById(req.params.slug)

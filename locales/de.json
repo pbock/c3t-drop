@@ -35,5 +35,7 @@
 		"one": "Wir haben deine Datei und deinen Kommentar erhalten.",
 		"other": "Wir haben deine %s Dateien und deinen Kommentar erhalten."
 	},
-	"Read Access": "Lesezugriff"
+	"Read Access": "Lesezugriff",
+	"No comments have been submitted yet.": "Es gibt noch keine Kommentare.",
+	"Comments": "Kommentare"
 }

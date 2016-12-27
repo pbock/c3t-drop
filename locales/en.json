@@ -38,5 +38,7 @@
 		"other": "We’ve received %s files and your comment."
 	},
 	"Sorry, we didn’t catch that.": "Sorry, we didn’t catch that.",
-	"Read Access": "Read Access"
+	"Read Access": "Read Access",
+	"No comments have been submitted yet.": "No comments have been submitted yet.",
+	"Comments": "Comments"
 }

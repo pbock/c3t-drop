@@ -110,6 +110,16 @@ module.exports = function(scheduleJsonPath, fileRootPath, shouldLog=true) {
 			return this._filesCache;
 		}
 
+		// This is NOT a getter because it is asynchronous
+		getComments() {
+			const commentPromises = _(files)
+				.map((meta, filePath) => ({ meta, path: filePath }))
+				.filter((file) => file.meta.isComment && file.path.indexOf(this.filePath) === 0)
+				.map(file => fs.readFile(file.path).then(body => ({ body, meta: file.meta })))
+				.value();
+			return Promise.all(commentPromises);
+		}
+
 		readFile(name) {
 			return fs.createReadStream(path.resolve(this.filePath, name));
 		}
