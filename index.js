@@ -20,6 +20,8 @@ const push = require('./lib/pushover');
 // Set up logger
 const log = bunyan.createLogger({ name: 'c3t-drop-server' });
 
+const MONTH = 30 * 24 * 60 * 60 * 1000;
+
 // Load config
 let config = {};
 try {
@@ -70,16 +72,28 @@ function forceAuth(req, res, next) {
 }
 function checkAuth(req, res, next) {
 	const user = basicAuth(req);
+	const cookieAuth = req.cookies.auth;
 
 	let authorized = false;
 	if (!config.readCredentials) authorized = false;
-	else if (user && user.name in config.readCredentials && user.pass === config.readCredentials[user.name]) authorized = true;
+	else if (user && user.name in config.readCredentials && user.pass === config.readCredentials[user.name]) {
+		authorized = true;
+		res.cookie('auth', `${user.name}:${user.pass}`, { maxAge: MONTH, httpOnly: true });
+	} else if (cookieAuth) {
+		try {
+			const [ cookieUser, cookiePass ] = cookieAuth.split(':');
+			authorized = cookieUser in config.readCredentials && cookiePass === config.readCredentials[cookieUser];
+		} catch (e) {
+			log.warn(e);
+		}
+	}
 
 	req.isAuthorized = authorized;
 	next();
 	return authorized;
 }
 
+app.use(cookieParser());
 app.use(checkAuth);
 
 app.use((req, res, next) => {
@@ -87,14 +101,13 @@ app.use((req, res, next) => {
 
 	if (req.query.lang) {
 		log.info('Setting language to %s', req.query.lang);
-		res.cookie('lang', req.query.lang, { maxAge: 900000, httpOnly: true });
+		res.cookie('lang', req.query.lang, { maxAge: MONTH, httpOnly: true });
 		const { pathname } = URL.parse(req.url);
 		res.redirect(pathname);
 	} else {
 		next();
 	}
 })
-app.use(cookieParser());
 app.use(i18n.init);
 
 app.set('views', path.resolve(__dirname, 'views/'));

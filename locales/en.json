@@ -49,5 +49,6 @@
 	"Day %s": {
 		"one": "Day %s",
 		"other": "Day %s"
-	}
+	},
+	"Sign In": "Sign In"
 }

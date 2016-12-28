@@ -16,7 +16,9 @@ html(lang=__('LOCALE'))
 				p.navbar-text.navbar-right
 					if isAuthorized
 						span.label.label-success= __('Read Access')
-						=' '
+					else
+						a.label.label-default(href='/sign-in')= __('Sign In')
+					=' '
 					a(href='?lang=de', lang='de', title='Deutsch') de
 					=' / '
 					a(href='?lang=en', lang='en', title='English') en
