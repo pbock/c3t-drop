@@ -46,5 +46,6 @@
 		"one": "Tag %s",
 		"other": "Tag %s"
 	},
-	"Sorry, you need read access to see comments.": "Du brauchst Lesezugriff, um die Kommentare zu sehen."
+	"Sorry, you need read access to see comments.": "Du brauchst Lesezugriff, um die Kommentare zu sehen.",
+	"Sign In": "Anmelden"
 }
