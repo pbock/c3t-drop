@@ -8,6 +8,7 @@ const i18n = require('i18n');
 const URL = require('url');
 const moment = require('moment')
 const _ = require('lodash');
+const archiver = require('archiver');
 
 // Middleware
 const cookieParser = require('cookie-parser');
@@ -191,6 +192,23 @@ app.post('/talks/:slug/files/', upload.any(), (req, res, next) => {
 			push({ title: `Failed to add files to talk ${requestTalk.title}`, message: err.stack });
 			next(err);
 		})
+})
+
+app.get('/talks/:slug/files.zip', forceAuth, (req, res, next) => {
+	return Talk.findBySlug(req.params.slug)
+		.then(ensureExistence)
+		.then(talk => {
+			const archive = archiver('zip');
+			archive.directory(talk.filePath, '/');
+			archive.on('error', next);
+			res.set({
+				'Content-Type': 'application/octet-stream',
+				'Content-Disposition': `attachment; filename="${talk.slug}.zip"`,
+			})
+			archive.pipe(res);
+			archive.finalize();
+		})
+		.catch(next)
 })
 
 app.get('/talks/:slug/files/:filename', forceAuth, (req, res, next) => {

@@ -79,6 +79,12 @@ block content
 			.well.well-lg
 				.text-muted= __('No files have been uploaded yet.')
 		else
+			if isAuthorized
+				p
+					a(href='files.zip').btn.btn-primary
+						span.glyphicon.glyphicon-download-alt
+						=' '
+						= __('Download All')
 			.list-group
 				each file in talk.files
 					if isAuthorized
