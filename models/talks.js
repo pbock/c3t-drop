@@ -179,7 +179,7 @@ module.exports = function(scheduleJsonPath, fileRootPath, shouldLog=true) {
 				_.each(schedule.conference.days, (day) => {
 					_.each(day.rooms, (talks) => {
 						_.each(talks, (talk) => {
-							new Talk(talk, day.index + 1)
+							new Talk(talk, day.index)
 						})
 					})
 				})
