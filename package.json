@@ -2,13 +2,32 @@
   "name": "c3t-drop",
   "version": "0.1.0",
   "description": "A drop point for material that helps us translate c3 talks",
-  "main": "index.js",
+  "main": "yarn start",
   "scripts": {
-    "start": "NODE_ENV=production node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "NODE_ENV=production ts-node index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "fix": "prettier --write index.ts \"lib/**/*.ts\" \"models/**/*.ts\" && tslint --project tsconfig.json --fix \"lib/**/*.ts\" \"models/**/*.ts\""
   },
   "author": "Philipp Bock <p@philippbock.de> (http://philippbock.de/)",
   "license": "MIT",
+  "devDependencies": {
+    "@types/archiver": "^2.1.2",
+    "@types/basic-auth": "^1.1.2",
+    "@types/bunyan": "^1.8.5",
+    "@types/chokidar": "^1.7.5",
+    "@types/cookie-parser": "^1.4.1",
+    "@types/express": "^4.16.0",
+    "@types/fs-promise": "^1.0.3",
+    "@types/helmet": "^0.0.42",
+    "@types/i18n": "^0.8.3",
+    "@types/lodash": "^4.14.118",
+    "@types/multer": "^1.3.7",
+    "ts-node": "^7.0.1",
+    "tslint": "^5.11.0",
+    "tslint-config-airbnb": "^5.11.1",
+    "tslint-config-prettier": "^1.16.0",
+    "typescript": "^3.1.6"
+  },
   "dependencies": {
     "archiver": "^1.3.0",
     "basic-auth": "^1.1.0",

@@ -56,10 +56,10 @@ block content
 			span.badge= talk.commentFiles.length
 		if isAuthorized
 			if talk.commentFiles.length
-				each comment in talk.comments
+				each comment in comments
 					.panel.panel-default
 						.panel-body= comment.body
-						.panel-footer= moment(comment.meta.stats.ctime).locale(__('LOCALE')).format(__('DATE_TIME'))
+						.panel-footer= moment(comment.info.stats.ctime).locale(__('LOCALE')).format(__('DATE_TIME'))
 			else
 				.well.well-lg
 					.text-muted= __('No comments have been submitted yet.')
