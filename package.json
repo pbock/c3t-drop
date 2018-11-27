@@ -5,8 +5,21 @@
   "main": "yarn start",
   "scripts": {
     "start": "NODE_ENV=production ts-node index.ts",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "fix": "prettier --write index.ts \"lib/**/*.ts\" \"models/**/*.ts\" && tslint --project tsconfig.json --fix \"lib/**/*.ts\" \"models/**/*.ts\""
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js"
+    ],
+    "transform": {
+      "\\.(ts|tsx)$": "ts-jest"
+    },
+    "testMatch": [
+      "**/__tests__/*.+(ts|tsx|js)"
+    ]
   },
   "author": "Philipp Bock <p@philippbock.de> (http://philippbock.de/)",
   "license": "MIT",
@@ -20,8 +33,11 @@
     "@types/fs-promise": "^1.0.3",
     "@types/helmet": "^0.0.42",
     "@types/i18n": "^0.8.3",
+    "@types/jest": "^23.3.9",
     "@types/lodash": "^4.14.118",
     "@types/multer": "^1.3.7",
+    "jest": "^23.6.0",
+    "ts-jest": "^23.10.5",
     "ts-node": "^7.0.1",
     "tslint": "^5.11.0",
     "tslint-config-airbnb": "^5.11.1",
