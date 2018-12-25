@@ -1,12 +1,13 @@
 'use strict';
 
-const path = require('path');
-const _ = require('lodash');
+import path = require('path');
+import _ = require('lodash');
+import TalkModel from './models/talks';
 
 const schedulePath = path.resolve(__dirname, 'schedule.json');
 const filesBase = path.resolve(__dirname, 'files/');
 
-const Talk = require('./models/talks')(schedulePath, filesBase, false);
+const Talk = TalkModel(schedulePath, filesBase, false);
 
 Promise.all([ Talk.all(), Talk._getAllFiles() ])
 	.then(([ talks, files ]) => {
