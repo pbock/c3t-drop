@@ -1,13 +1,13 @@
 extends layout.pug
 
 block title
-	title= __('Help Us Translate 35c3') + ' – ' + __('SITE_NAME')
+	title= __('HELP_US_TRANSLATE_EVENT') + ' – ' + __('SITE_NAME')
 
 block scripts
 	script(type='text/javascript', src='static/index.js')
 
 block content
-	h1= __('Help Us Translate 35c3')
+	h1= __('HELP_US_TRANSLATE_EVENT')
 	p= __('INTRO_TEXT')
 	p= __('INTRO_GET_STARTED')
 	p.input-group
@@ -16,7 +16,7 @@ block content
 			=' '
 			=__('Search')
 			noscript=' ' + __('(JavaScript required)')
-		input#filter.form-control(type='text', placeholder=__('Start typing to find talks by name or speaker'), autocomplete='off', autocorrect='off', autocapitalize='off', spellcheck='false') 
+		input#filter.form-control(type='text', placeholder=__('Start typing to find talks by name or speaker'), autocomplete='off', autocorrect='off', autocapitalize='off', spellcheck='false')
 	.list-group
 		each talk in talks
 			a(href=`/talks/${talk.slug}/`, data-filter-string=`${talk.title} ${talk.speakers.join(' ')}`).list-group-item
