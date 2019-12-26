@@ -4,3 +4,5 @@ files/
 .temp/
 config.js
 config.ts
+schedule.json
+schedule.*.json

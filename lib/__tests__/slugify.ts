@@ -2,9 +2,9 @@ import slugify from '../slugify';
 
 describe('slugify', () => {
   it('converts to kebab case', () => {
-    expect(slugify('Hello World! This is a test.')).toEqual('hello-world-this-is-a-test')
-    expect(slugify('"Remove PunctUATiOn!"')).toEqual('remove-punctuation')
-    expect(slugify('It\'s good enough')).toEqual('its-good-enough');
+    expect(slugify('Hello World! This is a test.')).toEqual('hello-world-this-is-a-test');
+    expect(slugify('"Remove PunctUATiOn!"')).toEqual('remove-punctuation');
+    expect(slugify("It's good enough")).toEqual('its-good-enough');
     expect(slugify('99 Luftballons')).toEqual('99-luftballons');
   });
 

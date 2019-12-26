@@ -36,10 +36,9 @@ if (!isProduction) {
   log.warn('NODE_ENV is not set to production. Actual value: %s', process.env.NODE_ENV);
 }
 
-const schedulePath = path.resolve(__dirname, 'schedule.json');
 const filesBase = path.resolve(__dirname, 'files/');
 
-const Talk = TalkModel(schedulePath, filesBase);
+const Talk = TalkModel(config.schedulePaths, filesBase);
 
 const upload = multer({
   dest: path.resolve(__dirname, '.temp/'),

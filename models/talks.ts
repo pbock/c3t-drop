@@ -15,7 +15,6 @@ import wait from '../lib/wait-promise';
 
 const COMMENT_EXTENSION = '.comment.txt';
 
-
 export class TalkFile {
   name: string;
   redactedName: string;
@@ -42,11 +41,14 @@ interface FileInfo {
 }
 
 export default function TalkModel(
-  scheduleJsonPath: string,
+  scheduleJsonPath: string | string[],
   fileRootPath: string,
   shouldLog = true
 ) {
   const log = bunyan.createLogger({ name: 'c3t-drop-model', level: shouldLog ? 'info' : 'fatal' });
+
+  const scheduleJsonPaths: string[] =
+    typeof scheduleJsonPath === 'string' ? [scheduleJsonPath] : scheduleJsonPath;
 
   let talks: Talk[] = [];
   let sortedTalks: Talk[] = [];
@@ -183,21 +185,27 @@ export default function TalkModel(
   }
 
   function updateTalks() {
-    return fs
-      .readFile(scheduleJsonPath)
-      .then(buffer => JSON.parse(buffer.toString()))
-      .then(({ schedule }) => {
-        talks = [];
-        talksBySlug = {};
+    // TODO: Refactor this so that talks won't be empty if a request comes in
+    // while the talks are being updated.
+    talks = [];
+    talksBySlug = {};
 
-        _.each(schedule.conference.days, day => {
-          _.each(day.rooms, talks => {
-            _.each(talks, talk => {
-              new Talk(talk, day.index);
+    return Promise.all(
+      scheduleJsonPaths.map(path =>
+        fs
+          .readFile(path)
+          .then(buffer => JSON.parse(buffer.toString()))
+          .then(({ schedule }) => {
+            _.each(schedule.conference.days, day => {
+              _.each(day.rooms, talks => {
+                _.each(talks, talk => {
+                  new Talk(talk, day.index);
+                });
+              });
             });
-          });
-        });
-      })
+          })
+      )
+    )
       .then(() => (sortedTalks = _.sortBy(talks, 'sortTitle')))
       .then(() => Promise.all(talks.map(t => fs.ensureDir(t.filePath))))
       .then(() => log.info('Done updating talks'));
@@ -226,7 +234,7 @@ export default function TalkModel(
       });
   });
 
-  const scheduleWatcher = chokidar.watch(scheduleJsonPath);
+  const scheduleWatcher = chokidar.watch(scheduleJsonPaths);
   scheduleWatcher.on('change', () => {
     log.info('Schedule changed; updating');
     talksReady = Promise.all([talksReady, filesReady]).then(updateTalks);
