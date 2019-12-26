@@ -57,6 +57,7 @@ export default function TalkModel(
     [path: string]: FileInfo;
   } = {};
   let filesLastUpdated = 0;
+  let versionInformation: string | null = null;
 
   let talksReady = updateTalks();
 
@@ -179,23 +180,34 @@ export default function TalkModel(
       return _.find(talks, { id });
     }
 
+    static getScheduleVersion(): null | string {
+      return versionInformation;
+    }
+
     static _getAllFiles() {
       return files;
     }
   }
 
-  function updateTalks() {
+  async function updateTalks() {
     // TODO: Refactor this so that talks won't be empty if a request comes in
     // while the talks are being updated.
     talks = [];
     talksBySlug = {};
+    versionInformation = null;
+    const v: string[] = [];
 
-    return Promise.all(
+    await Promise.all(
       scheduleJsonPaths.map(path =>
         fs
           .readFile(path)
           .then(buffer => JSON.parse(buffer.toString()))
           .then(({ schedule }) => {
+            try {
+              v.push(`${schedule.conference.acronym}: ${schedule.version}`);
+            } catch (e) {
+              log.warn(e);
+            }
             _.each(schedule.conference.days, day => {
               _.each(day.rooms, talks => {
                 _.each(talks, talk => {
@@ -205,10 +217,12 @@ export default function TalkModel(
             });
           })
       )
-    )
-      .then(() => (sortedTalks = _.sortBy(talks, 'sortTitle')))
-      .then(() => Promise.all(talks.map(t => fs.ensureDir(t.filePath))))
-      .then(() => log.info('Done updating talks'));
+    );
+
+    versionInformation = v.sort().join('; ');
+    sortedTalks = _.sortBy(talks, 'sortTitle');
+    await Promise.all(talks.map(t => fs.ensureDir(t.filePath)));
+    log.info('Done updating talks');
   }
 
   let isInitialScan = true;

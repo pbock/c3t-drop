@@ -31,3 +31,6 @@ block content
 					=' '
 					if talk.commentFiles.length
 						span.label.label-info= __n('%s comments', talk.commentFiles.length)
+	if scheduleVersion
+		footer
+			p.text-muted.small= __('Schedule version: %s', scheduleVersion)

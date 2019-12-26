@@ -136,7 +136,10 @@ app.locals.moment = moment;
 
 app.get('/', (req: PotentiallyAuthenticatedRequest, res) => {
   const { isAuthorized } = req;
-  return Talk.allSorted().then(talks => res.render('index', { talks, isAuthorized }));
+  const scheduleVersion = Talk.getScheduleVersion();
+  return Talk.allSorted().then(talks =>
+    res.render('index', { talks, isAuthorized, scheduleVersion })
+  );
 });
 
 app.get('/impressum', (req: PotentiallyAuthenticatedRequest, res) => {

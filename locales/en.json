@@ -51,5 +51,6 @@
 		"other": "Day %s"
 	},
 	"Sign In": "Sign In",
-	"Download All": "Download All"
+	"Download All": "Download All",
+	"Schedule version: %s": "Schedule version: %s"
 }
