@@ -1,4 +1,4 @@
-import redactFilename from '../react-filename';
+import redactFilename from '../redact-filename';
 
 describe('redactFilename', () => {
   it('only shows the extension and the first and last two characters', () => {

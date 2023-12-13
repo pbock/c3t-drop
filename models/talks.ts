@@ -1,16 +1,16 @@
 'use strict';
 
-import chokidar = require('chokidar');
-import bunyan = require('bunyan');
-import path = require('path');
-import fs = require('fs-promise');
-import _ = require('lodash');
-import { Stats } from 'fs-promise';
+import * as chokidar from 'chokidar';
+import * as bunyan from 'bunyan';
+import * as path from 'path';
+import * as fs from 'fs/promises';
+import { createReadStream, type Stats, type ReadStream } from 'fs';
+import * as _ from 'lodash';
 
 import slugify from '../lib/slugify';
 import streamHash from '../lib/stream-hash';
 import sortTitle from '../lib/sort-title';
-import redactFilename from '../lib/react-filename';
+import redactFilename from '../lib/redact-filename';
 import wait from '../lib/wait-promise';
 
 const COMMENT_EXTENSION = '.comment.txt';
@@ -29,7 +29,7 @@ export class TalkFile {
   }
 
   read() {
-    return fs.createReadStream(this.path);
+    return createReadStream(this.path);
   }
 }
 
@@ -115,10 +115,10 @@ export default function TalkModel(
         this.filesCache = _(files)
           .map((meta, filePath) => ({ meta, path: filePath }))
           .filter(
-            file =>
+            (file) =>
               !file.meta.isDir && !file.meta.isComment && file.path.indexOf(this.filePath) === 0
           )
-          .map(file => new TalkFile(file.path, file.meta))
+          .map((file) => new TalkFile(file.path, file.meta))
           .value();
         this.filesCacheLastUpdated = Date.now();
       }
@@ -128,7 +128,7 @@ export default function TalkModel(
     get commentFiles(): TalkFile[] {
       if (!this.commentFilesCache || this.commentFilesCacheLastUpdated < filesLastUpdated) {
         this.commentFilesCache = _.map(files, (info, filePath) => ({ info, path: filePath }))
-          .filter(file => file.info.isComment && file.path.indexOf(this.filePath) === 0)
+          .filter((file) => file.info.isComment && file.path.indexOf(this.filePath) === 0)
           .map((file: { info: FileInfo; path: string }) => new TalkFile(file.path, file.info));
         this.commentFilesCacheLastUpdated = Date.now();
       }
@@ -138,13 +138,13 @@ export default function TalkModel(
     // This is NOT a getter because it is asynchronous
     getComments(): Promise<{ body: Buffer; info: FileInfo }[]> {
       const commentPromises = _.map(files, (info, filePath) => ({ info, path: filePath }))
-        .filter(file => file.info.isComment && file.path.indexOf(this.filePath) === 0)
-        .map(file => fs.readFile(file.path).then(body => ({ body, info: file.info })));
+        .filter((file) => file.info.isComment && file.path.indexOf(this.filePath) === 0)
+        .map((file) => fs.readFile(file.path).then((body) => ({ body, info: file.info })));
       return Promise.all(commentPromises);
     }
 
-    readFile(name: string): fs.ReadStream {
-      return fs.createReadStream(path.resolve(this.filePath, name));
+    readFile(name: string): ReadStream {
+      return createReadStream(path.resolve(this.filePath, name));
     }
 
     async addComment(comment: string): Promise<this> {
@@ -154,7 +154,7 @@ export default function TalkModel(
 
     addFiles(files: Express.Multer.File[]) {
       return Promise.all(
-        files.map(file => fs.rename(file.path, path.resolve(this.filePath, file.originalname)))
+        files.map((file) => fs.rename(file.path, path.resolve(this.filePath, file.originalname)))
       )
         .then(wait(100)) // HACK: prevent Promise from resolving before watcher fired and file list has been rebuilt
         .then(() => this);
@@ -198,19 +198,19 @@ export default function TalkModel(
     const v: string[] = [];
 
     await Promise.all(
-      scheduleJsonPaths.map(path =>
+      scheduleJsonPaths.map((path) =>
         fs
           .readFile(path)
-          .then(buffer => JSON.parse(buffer.toString()))
+          .then((buffer) => JSON.parse(buffer.toString()))
           .then(({ schedule }) => {
             try {
               v.push(`${schedule.conference.acronym}: ${schedule.version}`);
             } catch (e) {
               log.warn(e);
             }
-            _.each(schedule.conference.days, day => {
-              _.each(day.rooms, talks => {
-                _.each(talks, talk => {
+            _.each(schedule.conference.days, (day) => {
+              _.each(day.rooms, (talks) => {
+                _.each(talks, (talk) => {
                   new Talk(talk, day.index);
                 });
               });
@@ -221,12 +221,12 @@ export default function TalkModel(
 
     versionInformation = v.sort().join('; ');
     sortedTalks = _.sortBy(talks, 'sortTitle');
-    await Promise.all(talks.map(t => fs.ensureDir(t.filePath)));
+    await Promise.all(talks.map((t) => fs.mkdir(t.filePath, { recursive: true })));
     log.info('Done updating talks');
   }
 
   let isInitialScan = true;
-  const filesReady = new Promise(resolve => {
+  const filesReady = new Promise<void>((resolve) => {
     const fileWatcher = chokidar.watch(fileRootPath, {
       alwaysStat: true,
       ignored: '**/.DS_Store',
@@ -237,7 +237,7 @@ export default function TalkModel(
       .on('unlink', removeFile)
       .on('addDir', addDir)
       .on('unlinkDir', removeDir)
-      .on('error', e => {
+      .on('error', (e) => {
         log.error(e);
         process.exit(1);
       })
@@ -261,7 +261,7 @@ export default function TalkModel(
     files[p] = { stats, isComment, isDir: false, hash: null };
     filesLastUpdated = Date.now();
     streamHash(p)
-      .then(hash => {
+      .then((hash) => {
         // In the meantime, the file may have been deleted, in which case
         // attempting to write the hash would throw an error.
         if (!files[p]) return;

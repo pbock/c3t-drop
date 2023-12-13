@@ -1,17 +1,17 @@
-import path = require('path');
-import bunyan = require('bunyan');
-import express = require('express');
-import multer = require('multer');
-import i18n = require('i18n');
-import URL = require('url');
-import moment = require('moment');
-import _ = require('lodash');
-import archiver = require('archiver');
+import * as path from 'path';
+import * as bunyan from 'bunyan';
+import * as express from 'express';
+import * as multer from 'multer';
+import * as i18n from 'i18n';
+import * as URL from 'url';
+import * as moment from 'moment';
+import * as _ from 'lodash';
+import * as archiver from 'archiver';
 
 // Middleware
-import cookieParser = require('cookie-parser');
-import helmet = require('helmet');
-import basicAuth = require('basic-auth');
+import * as cookieParser from 'cookie-parser';
+import helmet from 'helmet';
+import * as basicAuth from 'basic-auth';
 
 // Models
 import TalkModel, { TalkFile } from './models/talks';
@@ -106,7 +106,7 @@ function checkAuth(
   return authorized;
 }
 
-app.use(cookieParser());
+app.use(cookieParser() as any);
 app.use(checkAuth);
 
 app.use((req, res, next) => {
@@ -128,16 +128,16 @@ app.set('view engine', 'pug');
 
 app.use(
   '/vendor/bootstrap',
-  express.static(path.resolve(__dirname, 'node_modules/bootstrap/dist/'))
+  express.static(path.resolve(__dirname, 'node_modules/bootstrap/dist/')) as any
 );
-app.use('/static', express.static(path.resolve(__dirname, 'static/')));
+app.use('/static', express.static(path.resolve(__dirname, 'static/')) as any);
 
 app.locals.moment = moment;
 
 app.get('/', (req: PotentiallyAuthenticatedRequest, res) => {
   const { isAuthorized } = req;
   const scheduleVersion = Talk.getScheduleVersion();
-  return Talk.allSorted().then(talks =>
+  return Talk.allSorted().then((talks) =>
     res.render('index', { talks, isAuthorized, scheduleVersion })
   );
 });
@@ -161,7 +161,7 @@ app.get('/talks/:slug', (req: PotentiallyAuthenticatedRequest, res, next) => {
   return (
     Talk.findBySlug(req.params.slug)
       .then(ensureExistence)
-      .then(async talk => {
+      .then(async (talk) => {
         if (req.isAuthorized) {
           const comments = await talk.getComments();
           // FIXME: This destroys the getter
@@ -183,7 +183,7 @@ app.get('/talks/:slug', (req: PotentiallyAuthenticatedRequest, res, next) => {
       .catch(() =>
         Talk.findById(req.params.slug)
           .then(ensureExistence)
-          .then(talk => res.redirect(`/talks/${talk.slug}/`))
+          .then((talk) => res.redirect(`/talks/${talk.slug}/`))
       )
       .catch(next)
   );
@@ -193,7 +193,7 @@ app.get('/sign-in', forceAuth, (req, res) => {
   res.redirect('/');
 });
 
-app.post('/talks/:slug/files/', upload.any(), (req, res, next) => {
+app.post('/talks/:slug/files/', upload.any() as any, (req, res, next) => {
   let requestTalk;
   const { body } = req;
   const files = req.files as Express.Multer.File[];
@@ -205,19 +205,19 @@ app.post('/talks/:slug/files/', upload.any(), (req, res, next) => {
   log.info({ files, body }, 'Files received');
   return Talk.findBySlug(req.params.slug)
     .then(ensureExistence)
-    .then(talk => {
+    .then((talk) => {
       requestTalk = talk;
       const tasks = [];
       if (files.length) tasks.push(talk.addFiles(files));
       if (body.comment) tasks.push(talk.addComment(body.comment));
       return Promise.all(tasks).then(() => talk);
     })
-    .then(talk => {
+    .then((talk) => {
       res.redirect(
         `/talks/${talk.slug}/?uploadCount=${files.length}&commentCount=${body.comment ? '1' : '0'}`
       );
     })
-    .catch(err => {
+    .catch((err) => {
       log.error(err, 'Failed to add files');
       next(err);
     });
@@ -226,7 +226,7 @@ app.post('/talks/:slug/files/', upload.any(), (req, res, next) => {
 app.get('/talks/:slug/files.zip', forceAuth, (req, res, next) => {
   return Talk.findBySlug(req.params.slug)
     .then(ensureExistence)
-    .then(talk => {
+    .then((talk) => {
       const archive = archiver('zip');
       archive.directory(talk.filePath, '/');
       archive.on('error', next);
@@ -243,7 +243,7 @@ app.get('/talks/:slug/files.zip', forceAuth, (req, res, next) => {
 app.get('/talks/:slug/files/:filename', forceAuth, (req, res, next) => {
   return Talk.findBySlug(req.params.slug)
     .then(ensureExistence)
-    .then(talk => {
+    .then((talk) => {
       const file = _.find(talk.files, { name: req.params.filename }) as TalkFile;
       if (!file) {
         const error = new Error404('File not found');
