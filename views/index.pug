@@ -19,7 +19,7 @@ block content
 		input#filter.form-control(type='text', placeholder=__('Start typing to find talks by name or speaker'), autocomplete='off', autocorrect='off', autocapitalize='off', spellcheck='false')
 	.list-group
 		each talk in talks
-			a(href=`/talks/${talk.slug}/`, data-filter-string=`${talk.title} ${talk.speakers.join(' ')}`).list-group-item
+			a(href=`/talks/${talk.id}/`, data-filter-string=`${talk.title} ${talk.speakers.join(' ')}`).list-group-item
 				h5.list-group-item-heading
 					= talk.title
 				p.list-group-item-text

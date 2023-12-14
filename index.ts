@@ -155,55 +155,47 @@ function ensureExistence<T>(thing?: T | null): T {
   return thing;
 }
 
-app.get('/talks/:slug', (req: PotentiallyAuthenticatedRequest, res, next) => {
+app.get('/talks/:id', (req: PotentiallyAuthenticatedRequest, res, next) => {
   const { uploadCount, commentCount, nothingReceived } = req.query;
   const { isAuthorized } = req;
-  return (
-    Talk.findBySlug(req.params.slug)
-      .then(ensureExistence)
-      .then(async (talk) => {
-        if (req.isAuthorized) {
-          const comments = await talk.getComments();
-          // FIXME: This destroys the getter
-          return { talk, comments };
-        }
-        return { talk };
-      })
-      .then(({ talk, comments }) => {
-        res.render('talk', {
-          talk,
-          comments,
-          uploadCount,
-          commentCount,
-          nothingReceived,
-          isAuthorized,
-        });
-      })
-      // If that failed, try looking the talk up by ID instead
-      .catch(() =>
-        Talk.findById(req.params.slug)
-          .then(ensureExistence)
-          .then((talk) => res.redirect(`/talks/${talk.slug}/`))
-      )
-      .catch(next)
-  );
+  return Talk.findById(req.params.id)
+    .then(ensureExistence)
+    .then(async (talk) => {
+      if (req.isAuthorized) {
+        const comments = await talk.getComments();
+        // FIXME: This destroys the getter
+        return { talk, comments };
+      }
+      return { talk };
+    })
+    .then(({ talk, comments }) => {
+      res.render('talk', {
+        talk,
+        comments,
+        uploadCount,
+        commentCount,
+        nothingReceived,
+        isAuthorized,
+      });
+    })
+    .catch(next);
 });
 
 app.get('/sign-in', forceAuth, (req, res) => {
   res.redirect('/');
 });
 
-app.post('/talks/:slug/files/', upload.any() as any, (req, res, next) => {
+app.post('/talks/:id/files/', upload.any() as any, (req, res, next) => {
   let requestTalk;
   const { body } = req;
   const files = req.files as Express.Multer.File[];
   if (!files.length && !body.comment) {
     log.info('Form submitted, but no files and no comment received');
-    res.redirect(`/talks/${req.params.slug}/?nothingReceived=true`);
+    res.redirect(`/talks/${req.params.id}/?nothingReceived=true`);
     return;
   }
   log.info({ files, body }, 'Files received');
-  return Talk.findBySlug(req.params.slug)
+  return Talk.findById(req.params.id)
     .then(ensureExistence)
     .then((talk) => {
       requestTalk = talk;
@@ -214,7 +206,7 @@ app.post('/talks/:slug/files/', upload.any() as any, (req, res, next) => {
     })
     .then((talk) => {
       res.redirect(
-        `/talks/${talk.slug}/?uploadCount=${files.length}&commentCount=${body.comment ? '1' : '0'}`
+        `/talks/${talk.id}/?uploadCount=${files.length}&commentCount=${body.comment ? '1' : '0'}`
       );
     })
     .catch((err) => {
@@ -223,8 +215,8 @@ app.post('/talks/:slug/files/', upload.any() as any, (req, res, next) => {
     });
 });
 
-app.get('/talks/:slug/files.zip', forceAuth, (req, res, next) => {
-  return Talk.findBySlug(req.params.slug)
+app.get('/talks/:id/files.zip', forceAuth, (req, res, next) => {
+  return Talk.findById(req.params.id)
     .then(ensureExistence)
     .then((talk) => {
       const archive = archiver('zip');
@@ -240,8 +232,8 @@ app.get('/talks/:slug/files.zip', forceAuth, (req, res, next) => {
     .catch(next);
 });
 
-app.get('/talks/:slug/files/:filename', forceAuth, (req, res, next) => {
-  return Talk.findBySlug(req.params.slug)
+app.get('/talks/:id/files/:filename', forceAuth, (req, res, next) => {
+  return Talk.findById(req.params.id)
     .then(ensureExistence)
     .then((talk) => {
       const file = _.find(talk.files, { name: req.params.filename }) as TalkFile;
@@ -254,15 +246,9 @@ app.get('/talks/:slug/files/:filename', forceAuth, (req, res, next) => {
     .catch(next);
 });
 
-app.get('/talks/:slug/files/', (req, res) => {
-  res.redirect(`/${req.params.slug}/`);
+app.get('/talks/:id/files/', (req, res) => {
+  res.redirect(`/talks/${req.params.id}/`);
 });
-
-// app.get('/:slug/files/:file', (req, res, next) => {
-// 	return Talk.findBySlug(req.params.slug)
-// 		.then(talk => { talk.readFile(req.params.file).pipe(res) })
-// 		.catch(next)
-// })
 
 app.use((req, res, next) => {
   log.info(`%s %s Request didn't match a route`, req.method, req.url);
